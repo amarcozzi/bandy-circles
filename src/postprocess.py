@@ -1,5 +1,6 @@
 import fdsreader
 from fdsreader import Simulation, mesh
+import numpy as np
 
 
 def get_normalized_ros(data):
@@ -14,7 +15,7 @@ def get_normalized_ros(data):
             c) Right of the circle.
     Step 3) Average left + right velocities and divide by center velocity to
             get normalized rate of spread.
-    
+
     NOTE: we need to decide if we are going to do this once or for every time step.
     """
 
@@ -112,6 +113,19 @@ def stitch_mesh_data_to_array(list_of_meshes):
         A 3D array-like object of data of a quantity. Dimensions of the array are (time, y, x).
     """
 
+    data = []
+    meshes = np.vstack(list_of_meshes)
+    for row in range(len(meshes)):
+        if row == 0:  # add the first row to the data
+            data.append(list_of_meshes[row])
+        # if the current row is not equal to the previous row, add it to the data
+        if not np.array_equal(list_of_meshes[row], list_of_meshes[row-1]):
+            data.append(list_of_meshes[row])
+
+    stitched_data = np.array(data)
+
+    return stitched_data
+
 
 def get_bndf_data(sim, qty):
     """
@@ -134,6 +148,17 @@ def get_bndf_data(sim, qty):
     data : array-like object
         A 3D array-like object of data of a quantity. Dimensions of the array are (time, y, x).
     """
+    # get global boundary data arrays for each individual mesh
+    data = []
+
+    for mesh in sim.meshes:
+        data.append(
+            mesh.get_boundary_data(quantity=qty))
+
+    # stitch the data together
+    stitched_data = stitch_mesh_data_to_array(data)
+
+    return stitched_data
 
 
 def get_slice_data(sim, qty):
@@ -157,6 +182,29 @@ def get_slice_data(sim, qty):
     data : array-like object
         A 3D array-like object of data of a quantity. Dimensions of the array are (time, y, x).
     """
+    # get slice data arrays for each individual mesh
+    data = []
+    coords = []
+    times = []
+
+    for slice in sim.slices:
+
+        # Creates a global numpy ndarray from all subslices (of the slice)
+        # xyz is the returned matching coordinate for each value on the generated grid (data).
+        # can return large sparse arrays for some slices
+        slice_data, slice_coords = slice.to_global(
+            return_coordinates=True)
+        # times for each slice
+        slice_times = slice.times
+
+        data.append(slice_data)
+        coords.append(slice_coords)
+        times.append(slice_times)
+
+    # stitch the data together ?
+    # stitched_data = stitch_mesh_data_to_array(data)
+
+    return data
 
 
 def process_simulation(sim_id):
