@@ -1,5 +1,5 @@
 import fdsreader
-from fdsreader import Simulation, mesh
+from fdsreader import Simulation
 import numpy as np
 
 
@@ -113,6 +113,8 @@ def stitch_mesh_data_to_array(list_of_meshes):
         A 3D array-like object of data of a quantity. Dimensions of the array are (time, y, x).
     """
 
+    return np.vstack(list_of_meshes)
+
     data = []
     meshes = np.vstack(list_of_meshes)
     for row in range(len(meshes)):
@@ -156,9 +158,9 @@ def get_bndf_data(sim, qty):
             mesh.get_boundary_data(quantity=qty))
 
     # stitch the data together
-    stitched_data = stitch_mesh_data_to_array(data)
+    data = stitch_mesh_data_to_array(data)
 
-    return stitched_data
+    return data
 
 
 def get_slice_data(sim, qty):
@@ -200,9 +202,6 @@ def get_slice_data(sim, qty):
         data.append(slice_data)
         coords.append(slice_coords)
         times.append(slice_times)
-
-    # stitch the data together ?
-    # stitched_data = stitch_mesh_data_to_array(data)
 
     return data
 
