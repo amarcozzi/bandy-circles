@@ -25,6 +25,10 @@ class TestProcessSimulation:
 
 class TestStitchedData:
 
+    def test_number_of_meshes(self):
+
+        assert len(sim.meshes) == 36
+
     def test_stitch_np(self):
 
         # three 3x3 arrays
@@ -36,20 +40,35 @@ class TestStitchedData:
                               pp.stitch_mesh_data_to_array([a, b, c]))
 
     def test_stitch_mesh_data_to_array(self):
-        sim.meshes
-        pass
+
+        assert np.array_equal(np.vstack(sim.meshes),
+                              pp.stitch_mesh_data_to_array(sim.meshes))
 
 
 class TestSliceData:
 
-    def test_get_slice_data(self):
+    def test_len_of_slice_data(self):
 
+        assert len(pp.get_slice_data(sim, sim)) == len(sim.slices)
+
+    def test_get_slice_data_values(self):
+
+        method_data = pp.get_slice_data(sim, sim)
         slice_data = []
+        data_ind = []
+        idx = 0
         for slice in sim.slices:
-            slice_data.append(slice.to_global(return_coordinates=False))
 
-        assert np.array_equal(
-            slice_data, pp.get_slice_data(sim, sim))
+            data, coords = slice.to_global(
+                return_coordinates=True, masked=True)
+
+            slice_data.append(data)
+
+            data_ind.append(np.array_equal(
+                data, method_data[idx]))
+            idx += 1
+
+        assert all(data_ind)
 
 
 class TestBNDFData:
@@ -83,3 +102,8 @@ class TestFireLine:
 
 class TestActiveFireArray:
     pass
+
+
+if __name__ == "__main__":
+    slice = TestSliceData()
+    slice.test_get_slice_data()

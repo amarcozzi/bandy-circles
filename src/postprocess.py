@@ -195,7 +195,7 @@ def get_slice_data(sim, qty):
         # xyz is the returned matching coordinate for each value on the generated grid (data).
         # can return large sparse arrays for some slices
         slice_data, slice_coords = slice.to_global(
-            return_coordinates=True)
+            return_coordinates=True, masked=True)
         # times for each slice
         slice_times = slice.times
 
