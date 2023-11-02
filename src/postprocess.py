@@ -91,6 +91,12 @@ def get_active_fire_array(data, threshold):
         An array-like object of boolean values. 1 is on fire, 0 is not on fire.
     """
 
+    active_fire_array = np.zeros(data.shape)
+
+    active_fire_array[data > threshold] = 1
+
+    return active_fire_array
+
 
 def stitch_mesh_data_to_array(list_of_meshes):
     """

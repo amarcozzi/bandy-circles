@@ -25,10 +25,6 @@ class TestProcessSimulation:
 
 class TestStitchedData:
 
-    def test_number_of_meshes(self):
-
-        assert len(sim.meshes) == 36
-
     def test_stitch_np(self):
 
         # three 3x3 arrays
@@ -46,6 +42,12 @@ class TestStitchedData:
 
 
 class TestSliceData:
+
+    def test_number_of_slices(self):
+
+        assert len(sim.slices) == 4
+
+    # test shape of slice.to_global() data?
 
     def test_len_of_slice_data(self):
 
@@ -73,6 +75,10 @@ class TestSliceData:
 
 class TestBNDFData:
 
+    def test_number_of_meshes(self):
+
+        assert len(sim.meshes) == 36
+
     def test_get_bndf_data_wall_temp(self):
 
         bndf_data = []
@@ -85,6 +91,7 @@ class TestBNDFData:
         assert np.array_equal(
             bndf_data, pp.get_bndf_data(sim, "WALL TEMPERATURE"))
 
+    ''' Errors with quantity="TEMPERATURE" '''
     # def test_get_bndf_data_temp(self):
 
     #     bndf_data = []
@@ -101,6 +108,8 @@ class TestFireLine:
 
 
 class TestActiveFireArray:
+
+    # TODO: test the shape of the returned array is the shape of a slice[i] from sim
     pass
 
 
