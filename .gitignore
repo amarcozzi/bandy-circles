@@ -1,3 +1,6 @@
+# ignore .bdf files that generate_bdf_files.py creates as testing data
+*.bdf
+
 # 
 /src/export_array_to_fds.py
 

@@ -1,17 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import export_array_to_fds as eaf
 
 # constants
-Radius = 1.8288  # m
+RADIUS = 1.8288  # m
 
-ControlMass = 0.5  # kg/m^3
-TreatmentMass = 1.27  # kg/m^3
+CONTROLMASS = 0.5  # kg/m^3
+TREATMENTMASS = 1.27  # kg/m^3
 
-ControlHeight = 0.6  # m
-TreatmentHeight = 0.15  # m
+CONTROLHEIGHT = 0.6  # m
+TREATMENTHEIGHT = 0.15  # m
 
-
-# start of function
 
 def generate_bdf_files(xmin=-9, xmax=9, dx=0.1, ymin=-12, ymax=12, dy=0.1):
     '''
@@ -34,7 +33,6 @@ def generate_bdf_files(xmin=-9, xmax=9, dx=0.1, ymin=-12, ymax=12, dy=0.1):
 
     Returns
     -------
-    # TODO: add return value
         None
     '''
 
@@ -44,18 +42,23 @@ def generate_bdf_files(xmin=-9, xmax=9, dx=0.1, ymin=-12, ymax=12, dy=0.1):
 
     xx, yy = np.meshgrid(x_coords, y_coords, indexing='xy')
 
-    # TODO: we need this as a 3D array (?)
-    inside_circle = np.square(xx) + np.square(yy) <= np.square(Radius)
+    inside_circle = np.square(xx) + np.square(yy) <= np.square(RADIUS)
 
-    NY = inside_circle.shape[0]
-    NX = inside_circle.shape[1]
-    # make a 3D array (NY, NX, 1)
-    control_array = np.ones((NY, NX, 1)) * ControlMass
+    ny = inside_circle.shape[0]
+    nx = inside_circle.shape[1]
+    # make a 3D array (ny, nx, 1)
+    control_array = np.ones((ny, nx, 1)) * CONTROLMASS
     control_array[:, :, 0] *= ~inside_circle
 
-    treatment_array = np.ones((NY, NX, 1)) * TreatmentMass
+    treatment_array = np.ones((ny, nx, 1)) * TREATMENTMASS
     treatment_array[:, :, 0] *= inside_circle
 
+    eaf.export_array_to_fds(
+        ".", "control", control_array, dx, dy, CONTROLHEIGHT)
+    eaf.export_array_to_fds(
+        ".", "treatment", treatment_array, dx, dy, TREATMENTHEIGHT)
 
-if 'main' == __name__:
+
+if '__main__' == __name__:
+    # test generate_bdf_files
     generate_bdf_files()
