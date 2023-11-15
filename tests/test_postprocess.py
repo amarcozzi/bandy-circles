@@ -116,3 +116,6 @@ class TestActiveFireArray:
 if __name__ == "__main__":
     slice = TestSliceData()
     slice.test_get_slice_data()
+
+
+# display boolean on fire/ not on fire for validation

@@ -1,4 +1,4 @@
-import fdsreader
+import fdsreader as fds
 from fdsreader import Simulation
 import numpy as np
 
@@ -68,6 +68,44 @@ def get_fire_line(data):
         A list of tuples of the coordinates of the fire front. The format of coordinates
         is (x, y).
     """
+    # TODO: make sure input data is a 2D array of boolean values
+
+    data = data[0, :, :]
+
+    data = np.array(([0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [1, 1, 1, 0, 0, 0, 1, 1, 1, 0],
+                    [1, 1, 1, 1, 1, 1, 0, 0, 0, 1],
+                    [0, 1, 1, 1, 1, 0, 0, 0, 0, 0]))
+
+    row_coords = np.zeros(data.shape[0])
+
+    # TODO: a way to do this without 2 for loops?
+    x_coords = []
+
+    for column in data[0, :]:
+        c = data[0, :]
+        column = column
+        # record the first row that has a value of 1
+        for row in data[:, 0]:
+            y = data[:, 0]
+            row = row
+            print()
+            if (data[row, column] == 1) & (row_coords[row] == 0):
+                x_coords.append((row, column))
+                row_coords[row] = 1
+                break
+
+    # grab the top-most row of the data and return their x,y coordinates
+    x_coords = np.where(data[0] == 1)[0]
+    y_coords = np.zeros(len(x_coords))
+
+    # convert coordinates into cartesian coordinates
+    # x = u * (dx) + tx
+    # y = v * (dy) + ty
+
+    # combine the x and y coordinates into a list of tuples
+    fire_line = list(zip(x_coords, y_coords))
+    return fire_line
 
 
 def get_active_fire_array(data, threshold):
@@ -91,10 +129,12 @@ def get_active_fire_array(data, threshold):
         An array-like object of boolean values. 1 is on fire, 0 is not on fire.
     """
 
+    # for the one timestep  get active fire array
+
     active_fire_array = np.zeros(data.shape)
 
     active_fire_array[data > threshold] = 1
-
+    # TODO: returning a 3D array with times, x, y. Need to return a 2D array with x, y.
     return active_fire_array
 
 
@@ -118,7 +158,10 @@ def stitch_mesh_data_to_array(list_of_meshes):
     stitched_data : array-like object
         A 3D array-like object of data of a quantity. Dimensions of the array are (time, y, x).
     """
+    # FIXME: The meshes or slice arrays may not be the same shape. How do we handle this? vstack will not work in this case.
+    # determine the size of the stitched array
 
+    # treat as 2D array and iterate over time
     return np.vstack(list_of_meshes)
 
     data = []
@@ -233,7 +276,32 @@ def process_simulation(sim_id):
 
 
 def main():
-    pass
+
+    sim = fds.Simulation(
+        r"./tests/testing_data/Case_C064_fine_out_cat.smv")
+
+    hrr_array = get_slice_data(sim, "HRRPUV")
+    mass_flux_array = get_slice_data(sim, "MASS FLUX")
+
+    # stitched = stitch_mesh_data_to_array(hrr_array)
+    data_dict = {"hrr": hrr_array, "mass_flux": mass_flux_array}
+
+    # slice of hrr_array data: (time, y, x)
+    # need to get (x, y) coordinates of slice (2D array without time units)
+
+    hrr_x = hrr_array[0][1]  # == hrr_array[0][1, :, :] # THIS IS TRUE
+    print(f'HRR X:\n{hrr_x}\n\n')
+    hrr_y = hrr_array[0][2]  # == hrr_array[0][2, :, :] # THIS IS TRUE
+    print(f'HRR Y:\n{hrr_y}\n\n')
+    print((hrr_x) == (hrr_y))
+    print(hrr_x[0][-1])
+    print(hrr_y[0][0])
+    fire = get_active_fire_array(hrr_array[0], 0.1)
+
+    # TODO: input data needs to be a 2D array of boolean values
+    get_fire_line(fire)
+    print()
+    return
     # TODO: Parse arguments and get a simulation ID list
     sim_id_list = parse_arguments(args)
 
