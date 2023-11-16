@@ -3,6 +3,10 @@ from fdsreader import Simulation
 import numpy as np
 
 
+DX = 0.1  # m
+DY = 0.1  # m
+
+
 def get_normalized_ros(data):
     """
     Algorithm:
@@ -68,40 +72,39 @@ def get_fire_line(data):
         A list of tuples of the coordinates of the fire front. The format of coordinates
         is (x, y).
     """
-    # TODO: make sure input data is a 2D array of boolean values
+    print()
 
-    data = data[0, :, :]
+    data = np.array(([0, 0, 0, 0, 1],
+                    [1, 1, 1, 0, 0],
+                    [1, 1, 1, 1, 0],
+                    [1, 1, 1, 1, 1],
+                    [0, 1, 1, 1, 1]))
 
-    data = np.array(([0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    [1, 1, 1, 0, 0, 0, 1, 1, 1, 0],
-                    [1, 1, 1, 1, 1, 1, 0, 0, 0, 1],
-                    [0, 1, 1, 1, 1, 0, 0, 0, 0, 0]))
+    u_ind = []
+    v_ind = []
 
-    row_coords = np.zeros(data.shape[0])
-
-    # TODO: a way to do this without 2 for loops?
-    x_coords = []
-
-    for column in data[0, :]:
-        c = data[0, :]
-        column = column
-        # record the first row that has a value of 1
-        for row in data[:, 0]:
-            y = data[:, 0]
-            row = row
-            print()
-            if (data[row, column] == 1) & (row_coords[row] == 0):
-                x_coords.append((row, column))
-                row_coords[row] = 1
+    # grab the top-most array locations where the data = 1
+    for column in range(data.shape[1]):  # for each column
+        for row in range(data.shape[0]):  # for each row
+            if data[row, column] == 1:
+                u_ind.append(column)
+                v_ind.append(row)
                 break
 
-    # grab the top-most row of the data and return their x,y coordinates
-    x_coords = np.where(data[0] == 1)[0]
-    y_coords = np.zeros(len(x_coords))
+    x_coords = []
+    y_coords = []
+    # convert array locations into (x, y) cartesian coordinates
+    # TODO: determine how to calculate the values of tx and ty
+    tx = data.shape[0] * DX / 2
+    ty = data.shape[1] * DY / 2
 
-    # convert coordinates into cartesian coordinates
-    # x = u * (dx) + tx
-    # y = v * (dy) + ty
+    for u in u_ind:
+        x = u * DX - tx
+        x_coords.append(x)
+
+    for v in v_ind:
+        y = v * -DY + ty
+        y_coords.append(y)
 
     # combine the x and y coordinates into a list of tuples
     fire_line = list(zip(x_coords, y_coords))
@@ -129,12 +132,11 @@ def get_active_fire_array(data, threshold):
         An array-like object of boolean values. 1 is on fire, 0 is not on fire.
     """
 
-    # for the one timestep  get active fire array
+    # for a given timestep get active fire array
 
     active_fire_array = np.zeros(data.shape)
 
     active_fire_array[data > threshold] = 1
-    # TODO: returning a 3D array with times, x, y. Need to return a 2D array with x, y.
     return active_fire_array
 
 
@@ -162,6 +164,11 @@ def stitch_mesh_data_to_array(list_of_meshes):
     # determine the size of the stitched array
 
     # treat as 2D array and iterate over time
+    # for each timestep, stitch the meshes together
+    # iterate over each timestep and stitch these meshes together
+
+    for timestep in list_of_meshes[0, :, :]:
+        continue
     return np.vstack(list_of_meshes)
 
     data = []
@@ -239,18 +246,20 @@ def get_slice_data(sim, qty):
     times = []
 
     for slice in sim.slices:
+        if str(slice.quantity.name) == qty:
 
-        # Creates a global numpy ndarray from all subslices (of the slice)
-        # xyz is the returned matching coordinate for each value on the generated grid (data).
-        # can return large sparse arrays for some slices
-        slice_data, slice_coords = slice.to_global(
-            return_coordinates=True, masked=True)
-        # times for each slice
-        slice_times = slice.times
+            # Creates a global numpy ndarray from all subslices (of the slice)
+            # xyz is the returned matching coordinate for each value on the generated grid (data).
+            # can return large sparse arrays for some slices
+            slice_data, slice_coords = slice.to_global(
+                return_coordinates=True, masked=True)
+            # times for each slice
+            slice_times = slice.times
 
-        data.append(slice_data)
-        coords.append(slice_coords)
-        times.append(slice_times)
+            data.append(slice_data)
+            coords.append(slice_coords)
+            times.append(slice_times)
+            break
 
     return data
 
@@ -278,7 +287,7 @@ def process_simulation(sim_id):
 def main():
 
     sim = fds.Simulation(
-        r"./tests/testing_data/Case_C064_fine_out_cat.smv")
+        r"./tests/testing_data/test_data/out_crop_circles_cat.smv")
 
     hrr_array = get_slice_data(sim, "HRRPUV")
     mass_flux_array = get_slice_data(sim, "MASS FLUX")
@@ -296,7 +305,10 @@ def main():
     print((hrr_x) == (hrr_y))
     print(hrr_x[0][-1])
     print(hrr_y[0][0])
-    fire = get_active_fire_array(hrr_array[0], 0.1)
+
+    # get active fire array for a given slice  at a given timestep
+    # slice 0 timestep 0
+    fire = get_active_fire_array(hrr_array[0][0], 0.1)
 
     # TODO: input data needs to be a 2D array of boolean values
     get_fire_line(fire)

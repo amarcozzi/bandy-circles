@@ -11,9 +11,9 @@ import numpy as np
 from src import postprocess as pp
 import fdsreader as fds
 
-# sample simulation data
+# testing simulation data
 sim = fds.Simulation(
-    r"./tests/testing_data/Case_C064_fine_out_cat.smv")
+    r"./tests/testing_data/test_data/out_crop_circles_cat.smv")
 
 
 class TestProcessSimulation:
@@ -45,7 +45,7 @@ class TestSliceData:
 
     def test_number_of_slices(self):
 
-        assert len(sim.slices) == 4
+        assert len(sim.slices) == 6
 
     # test shape of slice.to_global() data?
 
@@ -77,7 +77,7 @@ class TestBNDFData:
 
     def test_number_of_meshes(self):
 
-        assert len(sim.meshes) == 36
+        assert len(sim.meshes) == 3
 
     def test_get_bndf_data_wall_temp(self):
 
