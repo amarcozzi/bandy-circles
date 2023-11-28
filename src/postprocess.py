@@ -49,7 +49,7 @@ def get_curvature(data):
     """
 
 
-def get_fire_line(data):
+def get_fire_line(data, coords):
     """
     Takes in a boolean array-like object and returns a list of tuples of the coordinates
     of the fire front. The format of coordinates is (x, y).
@@ -66,24 +66,22 @@ def get_fire_line(data):
     data : array-like object
         A 2D array-like object of boolean values. 1 is on fire, 0 is not on fire.
 
+    # TODO: Added this parameter. Is this correct?
+    coords : dict
+        A dictionary object of the (x, y, z) coordinates from the simulation.
+
     Returns
     -------
     fire_line : list of tuples
         A list of tuples of the coordinates of the fire front. The format of coordinates
         is (x, y).
     """
-    print()
-
-    data = np.array(([0, 0, 0, 0, 1],
-                    [1, 1, 1, 0, 0],
-                    [1, 1, 1, 1, 0],
-                    [1, 1, 1, 1, 1],
-                    [0, 1, 1, 1, 1]))
 
     u_ind = []
     v_ind = []
 
     # grab the top-most array locations where the data = 1
+    # one array location for each column
     for column in range(data.shape[1]):  # for each column
         for row in range(data.shape[0]):  # for each row
             if data[row, column] == 1:
@@ -93,21 +91,23 @@ def get_fire_line(data):
 
     x_coords = []
     y_coords = []
-    # convert array locations into (x, y) cartesian coordinates
-    # TODO: determine how to calculate the values of tx and ty
-    tx = data.shape[0] * DX / 2
-    ty = data.shape[1] * DY / 2
 
+    x_coords_data = coords["x"]
+    y_coords_data = coords["y"]
+
+    # convert array locations into (x, y) cartesian coordinates
     for u in u_ind:
-        x = u * DX - tx
+        x = x_coords_data[u] + DX / 2
         x_coords.append(x)
 
     for v in v_ind:
-        y = v * -DY + ty
+        # grabbing -v becuase the y coordinates start in bottom left corner; we need to flip the y coordinates
+        y = y_coords_data[-v] - DY / 2
         y_coords.append(y)
 
     # combine the x and y coordinates into a list of tuples
     fire_line = list(zip(x_coords, y_coords))
+
     return fire_line
 
 
@@ -135,8 +135,8 @@ def get_active_fire_array(data, threshold):
     # for a given timestep get active fire array
 
     active_fire_array = np.zeros(data.shape)
-
     active_fire_array[data > threshold] = 1
+
     return active_fire_array
 
 
@@ -167,8 +167,11 @@ def stitch_mesh_data_to_array(list_of_meshes):
     # for each timestep, stitch the meshes together
     # iterate over each timestep and stitch these meshes together
 
+    # for all timesteps
     for timestep in list_of_meshes[0, :, :]:
-        continue
+        # grab the 2D array at that timestep
+        meshes = list_of_meshes[timestep, :, :]
+
     return np.vstack(list_of_meshes)
 
     data = []
@@ -205,18 +208,31 @@ def get_bndf_data(sim, qty):
     -------
     data : array-like object
         A 3D array-like object of data of a quantity. Dimensions of the array are (time, y, x).
+
+    # TODO: Added this return. Is this correct?
+    coords : dict
+        A dictionary object of the (x, y, z) coordinates from the simulation.
     """
+
     # get global boundary data arrays for each individual mesh
     data = []
 
+    # grabs data when there is ONE mesh
     for mesh in sim.meshes:
         data.append(
             mesh.get_boundary_data(quantity=qty))
 
-    # stitch the data together
-    data = stitch_mesh_data_to_array(data)
+    # data [1] will need to be changed if there are multiple meshes
+    data = [data[0].data[1].data]
 
-    return data
+    coords = [data[0].get_coordinates()]
+
+    # stitch the data together if there are multiple meshes
+    # TODO: change this once we are ready to stitch MULTIPLE meshes together
+    if len(data) > 1:
+        data = stitch_mesh_data_to_array(data)
+
+    return data, coords
 
 
 def get_slice_data(sim, qty):
@@ -239,6 +255,10 @@ def get_slice_data(sim, qty):
     -------
     data : array-like object
         A 3D array-like object of data of a quantity. Dimensions of the array are (time, y, x).
+
+    # TODO: Added this return. Is this correct?
+    coords : dict
+        A dictionary object of the (x, y, z) coordinates from the simulation.
     """
     # get slice data arrays for each individual mesh
     data = []
@@ -259,9 +279,9 @@ def get_slice_data(sim, qty):
             data.append(slice_data)
             coords.append(slice_coords)
             times.append(slice_times)
-            break
+            break  # this break only grabs the first quantity
 
-    return data
+    return data, coords
 
 
 def process_simulation(sim_id):
@@ -287,32 +307,24 @@ def process_simulation(sim_id):
 def main():
 
     sim = fds.Simulation(
-        r"./tests/testing_data/test_data/out_crop_circles_cat.smv")
+        r"./tests/testing_data/test_data/3_meshes/out_crop_circles_cat.smv")
 
-    hrr_array = get_slice_data(sim, "HRRPUV")
-    mass_flux_array = get_slice_data(sim, "MASS FLUX")
+    sim = fds.Simulation(
+        r"./tests/testing_data/test_data/1_mesh/...........smv")
+
+    # grab boundary data and coordinates
+    hrr_array, coords = get_bndf_data(sim, "HRRPUV")
+
+    # determine what cells are on fire for a given timestep
+    # setting 115 kw/m^3 as the threshold for being on fire
+    active_fire_array = get_active_fire_array(hrr_array[10], 115)
+
+    # grab fire front (x, y) coordinates
+    fire_line = get_fire_line(active_fire_array, coords)
 
     # stitched = stitch_mesh_data_to_array(hrr_array)
     data_dict = {"hrr": hrr_array, "mass_flux": mass_flux_array}
 
-    # slice of hrr_array data: (time, y, x)
-    # need to get (x, y) coordinates of slice (2D array without time units)
-
-    hrr_x = hrr_array[0][1]  # == hrr_array[0][1, :, :] # THIS IS TRUE
-    print(f'HRR X:\n{hrr_x}\n\n')
-    hrr_y = hrr_array[0][2]  # == hrr_array[0][2, :, :] # THIS IS TRUE
-    print(f'HRR Y:\n{hrr_y}\n\n')
-    print((hrr_x) == (hrr_y))
-    print(hrr_x[0][-1])
-    print(hrr_y[0][0])
-
-    # get active fire array for a given slice  at a given timestep
-    # slice 0 timestep 0
-    fire = get_active_fire_array(hrr_array[0][0], 0.1)
-
-    # TODO: input data needs to be a 2D array of boolean values
-    get_fire_line(fire)
-    print()
     return
     # TODO: Parse arguments and get a simulation ID list
     sim_id_list = parse_arguments(args)
