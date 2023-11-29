@@ -73,7 +73,7 @@ def get_fire_line(data, coords):
     Returns
     -------
     fire_line : list of tuples
-        A list of tuples of the coordinates of the fire front. The format of coordinates
+        A list of tuples of the coordinates of the fire front for a given timestep. The format of coordinates
         is (x, y).
     """
 
@@ -134,6 +134,10 @@ def get_active_fire_array(data, threshold):
 
     # for a given timestep get active fire array
 
+    for timestep in data:
+        # grab the 2D array at that timestep
+        data = data[timestep, :, :]
+
     active_fire_array = np.zeros(data.shape)
     active_fire_array[data > threshold] = 1
 
@@ -160,9 +164,6 @@ def stitch_mesh_data_to_array(list_of_meshes):
     stitched_data : array-like object
         A 3D array-like object of data of a quantity. Dimensions of the array are (time, y, x).
     """
-    # FIXME: The meshes or slice arrays may not be the same shape. How do we handle this? vstack will not work in this case.
-    # determine the size of the stitched array
-
     # treat as 2D array and iterate over time
     # for each timestep, stitch the meshes together
     # iterate over each timestep and stitch these meshes together
@@ -222,10 +223,10 @@ def get_bndf_data(sim, qty):
         data.append(
             mesh.get_boundary_data(quantity=qty))
 
+    coords = [data[0].data[3].get_coordinates()]
     # data [1] will need to be changed if there are multiple meshes
-    data = [data[0].data[1].data]
-
-    coords = [data[0].get_coordinates()]
+    # [3] because 3 meshes
+    data = [data[0].data[3].data]
 
     # stitch the data together if there are multiple meshes
     # TODO: change this once we are ready to stitch MULTIPLE meshes together
@@ -307,13 +308,20 @@ def process_simulation(sim_id):
 def main():
 
     sim = fds.Simulation(
-        r"./tests/testing_data/test_data/3_meshes/out_crop_circles_cat.smv")
+        r"./tests/testing_data/3_meshes/test_data/out_crop_circles_cat.smv")
 
-    sim = fds.Simulation(
-        r"./tests/testing_data/test_data/1_mesh/...........smv")
+    # sim = fds.Simulation(
+    #     r"./tests/testing_data/test_data/1_mesh/...........smv")
 
     # grab boundary data and coordinates
-    hrr_array, coords = get_bndf_data(sim, "HRRPUV")
+    hrr_array, coords = get_bndf_data(sim, "WALL TEMPERATURE")
+
+    for timestep in hrr_array[0][0, :, :]:
+        print(timestep)
+        print(hrr_array[0][0, :, :].shape)
+        print(hrr_array[0][0, :, :])
+        print(hrr_array[0][:, 0, :])
+        print(hrr_array[0][:, :, 0])
 
     # determine what cells are on fire for a given timestep
     # setting 115 kw/m^3 as the threshold for being on fire
