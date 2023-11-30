@@ -132,12 +132,12 @@ def get_active_fire_array(data, threshold):
         An array-like object of boolean values. 1 is on fire, 0 is not on fire.
     """
 
-    # for a given timestep get active fire array
-
+    # TODO: for all timesteps
     for timestep in data:
         # grab the 2D array at that timestep
         data = data[timestep, :, :]
 
+    # for a given timestep get active fire array
     active_fire_array = np.zeros(data.shape)
     active_fire_array[data > threshold] = 1
 
@@ -168,25 +168,9 @@ def stitch_mesh_data_to_array(list_of_meshes):
     # for each timestep, stitch the meshes together
     # iterate over each timestep and stitch these meshes together
 
-    # for all timesteps
-    for timestep in list_of_meshes[0, :, :]:
-        # grab the 2D array at that timestep
-        meshes = list_of_meshes[timestep, :, :]
-
-    return np.vstack(list_of_meshes)
-
-    data = []
-    meshes = np.vstack(list_of_meshes)
-    for row in range(len(meshes)):
-        if row == 0:  # add the first row to the data
-            data.append(list_of_meshes[row])
-        # if the current row is not equal to the previous row, add it to the data
-        if not np.array_equal(list_of_meshes[row], list_of_meshes[row-1]):
-            data.append(list_of_meshes[row])
-
-    stitched_data = np.array(data)
-
-    return stitched_data
+    # TODO: this will change depending on how many meshes we are working with!
+    result_array = np.concatenate(
+        [arr[:, :, :] for arr in [data[0], data[1], data[2]]], axis=1)
 
 
 def get_bndf_data(sim, qty):
@@ -218,20 +202,28 @@ def get_bndf_data(sim, qty):
     # get global boundary data arrays for each individual mesh
     data = []
 
-    # grabs data when there is ONE mesh
     for mesh in sim.meshes:
         data.append(
             mesh.get_boundary_data(quantity=qty))
 
-    coords = [data[0].data[3].get_coordinates()]
-    # data [1] will need to be changed if there are multiple meshes
-    # [3] because 3 meshes
-    data = [data[0].data[3].data]
+    # TODO: should this be capitalized?
+    n_meshes = len(sim.meshes)
+
+    # grabs all data and coordinates for each mesh
+    bndf_data = []
+    coords = []
+
+    for mesh in n_meshes:
+        bndf_data.append([data[mesh].data[n_meshes].data])
+        coords.append(data[mesh].data[n_meshes].get_coordinates())
 
     # stitch the data together if there are multiple meshes
     # TODO: change this once we are ready to stitch MULTIPLE meshes together
-    if len(data) > 1:
+    # TODO: we need to stitch the x coordinates together if there are multiple meshes
+    if n_meshes > 1:
         data = stitch_mesh_data_to_array(data)
+        # TODO: this may not work for the coordinates depending on implementation
+        coords = stitch_mesh_data_to_array(coords)
 
     return data, coords
 
