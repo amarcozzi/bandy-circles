@@ -131,20 +131,23 @@ def get_active_fire_array(data, threshold):
     active_fire_array : array-like object
         An array-like object of boolean values. 1 is on fire, 0 is not on fire.
     """
+    active_fire_array = []
 
-    # TODO: for all timesteps
-    for timestep in data:
+    n_timesteps = len(data[:, 0, 0])
+
+    # active fire array for all timesteps
+    for timestep in range(n_timesteps):
         # grab the 2D array at that timestep
-        data = data[timestep, :, :]
-
-    # for a given timestep get active fire array
-    active_fire_array = np.zeros(data.shape)
-    active_fire_array[data > threshold] = 1
+        data_for_timestep = data[timestep, :, :]
+        # add active fire array for timestep to list of active fire arrays
+        fire_for_timestep = np.zeros(data_for_timestep.shape)
+        fire_for_timestep[data_for_timestep > threshold] = 1
+        active_fire_array.append(fire_for_timestep)
 
     return active_fire_array
 
 
-def stitch_mesh_data_to_array(list_of_meshes):
+def stitch_mesh_data_to_array(list_of_meshes, coords):
     """
     Takes data from an individual mesh and stitches it to a larger array.
 
@@ -168,9 +171,17 @@ def stitch_mesh_data_to_array(list_of_meshes):
     # for each timestep, stitch the meshes together
     # iterate over each timestep and stitch these meshes together
 
-    # TODO: this will change depending on how many meshes we are working with!
-    result_array = np.concatenate(
-        [arr[:, :, :] for arr in [data[0], data[1], data[2]]], axis=1)
+    data_array = [arr for arr in list_of_meshes]
+    # concatenate time, x, and y
+    # TODO: reflect this in docstring?
+    stitched_data = np.concatenate([arr[:, :, :]
+                                   for arr in data_array], axis=1)
+
+    # concatenate x coordinates and add y, z coordinates to coords
+    x_coords = [arr for arr in coords]
+    coords = {"x": x_coords, "y": coords[0]["y"], "z": coords[0]["z"]}
+
+    return stitched_data, coords
 
 
 def get_bndf_data(sim, qty):
@@ -200,10 +211,10 @@ def get_bndf_data(sim, qty):
     """
 
     # get global boundary data arrays for each individual mesh
-    data = []
+    mesh_data = []
 
     for mesh in sim.meshes:
-        data.append(
+        mesh_data.append(
             mesh.get_boundary_data(quantity=qty))
 
     # TODO: should this be capitalized?
@@ -213,17 +224,17 @@ def get_bndf_data(sim, qty):
     bndf_data = []
     coords = []
 
-    for mesh in n_meshes:
-        bndf_data.append([data[mesh].data[n_meshes].data])
-        coords.append(data[mesh].data[n_meshes].get_coordinates())
+    for mesh in range(n_meshes):
+        bndf_data.append(mesh_data[mesh].data[n_meshes].data)
+        coords.append(mesh_data[mesh].data[n_meshes].get_coordinates())
 
     # stitch the data together if there are multiple meshes
-    # TODO: change this once we are ready to stitch MULTIPLE meshes together
+
     # TODO: we need to stitch the x coordinates together if there are multiple meshes
     if n_meshes > 1:
-        data = stitch_mesh_data_to_array(data)
-        # TODO: this may not work for the coordinates depending on implementation
-        coords = stitch_mesh_data_to_array(coords)
+        data, coords = stitch_mesh_data_to_array(bndf_data, coords)
+    else:
+        data = bndf_data
 
     return data, coords
 
@@ -306,18 +317,11 @@ def main():
     #     r"./tests/testing_data/test_data/1_mesh/...........smv")
 
     # grab boundary data and coordinates
-    hrr_array, coords = get_bndf_data(sim, "WALL TEMPERATURE")
-
-    for timestep in hrr_array[0][0, :, :]:
-        print(timestep)
-        print(hrr_array[0][0, :, :].shape)
-        print(hrr_array[0][0, :, :])
-        print(hrr_array[0][:, 0, :])
-        print(hrr_array[0][:, :, 0])
+    bndf_array, coords = get_bndf_data(sim, 'TOTAL HEAT FLUX')
 
     # determine what cells are on fire for a given timestep
     # setting 115 kw/m^3 as the threshold for being on fire
-    active_fire_array = get_active_fire_array(hrr_array[10], 115)
+    active_fire_array = get_active_fire_array(bndf_array, 115)
 
     # grab fire front (x, y) coordinates
     fire_line = get_fire_line(active_fire_array, coords)
