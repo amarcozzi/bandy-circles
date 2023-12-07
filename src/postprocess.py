@@ -76,18 +76,31 @@ def get_fire_line(data, coords):
         A list of tuples of the coordinates of the fire front for a given timestep. The format of coordinates
         is (x, y).
     """
+    # data is:
+    # for testing data returning a list of 337 2D arrays of size (123, 301)
 
-    u_ind = []
-    v_ind = []
+    # TODO: need to determine DX and DY from the simulation
+
+    # TODO: store timestep, column, and row in a dictionary
+
+    u_ind = {}
+    v_ind = {}
 
     # grab the top-most array locations where the data = 1
     # one array location for each column
-    for column in range(data.shape[1]):  # for each column
-        for row in range(data.shape[0]):  # for each row
-            if data[row, column] == 1:
-                u_ind.append(column)
-                v_ind.append(row)
-                break
+    for timestep in range(len(data)):
+        # for each column in a given timestep
+        for column in range(data[timestep].shape[1]):
+            # for each row in a given timestep
+            for row in range(data[timestep].shape[0]):
+                if data[timestep][row, column] == 1:
+                    u_ind[timestep] = column
+                    v_ind[timestep] = row
+                    break
+    print()
+    # getting dx and dy from the coords dictionary
+    dx = round(coords["x"][1] - coords["x"][0], 5)
+    dy = round(coords["y"][1] - coords["y"][0], 5)
 
     x_coords = []
     y_coords = []
@@ -144,10 +157,11 @@ def get_active_fire_array(data, threshold):
         fire_for_timestep[data_for_timestep > threshold] = 1
         active_fire_array.append(fire_for_timestep)
 
+    # for testing data returning a list of 337 2D arrays of size (123, 301)
     return active_fire_array
 
 
-def stitch_mesh_data_to_array(list_of_meshes, coords):
+def stitch_mesh_data_to_array(list_of_meshes, coords=None):
     """
     Takes data from an individual mesh and stitches it to a larger array.
 
@@ -177,11 +191,14 @@ def stitch_mesh_data_to_array(list_of_meshes, coords):
     stitched_data = np.concatenate([arr[:, :, :]
                                    for arr in data_array], axis=1)
 
-    # concatenate x coordinates and add y, z coordinates to coords
-    x_coords = [arr for arr in coords]
-    coords = {"x": x_coords, "y": coords[0]["y"], "z": coords[0]["z"]}
+    if coords:
+        # concatenate x coordinates and add y, z coordinates to coords
+        x_coords = [arr for arr in coords]
+        coords = {"x": x_coords, "y": coords[0]["y"], "z": coords[0]["z"]}
 
-    return stitched_data, coords
+        return stitched_data, coords
+
+    return stitched_data
 
 
 def get_bndf_data(sim, qty):
@@ -227,6 +244,7 @@ def get_bndf_data(sim, qty):
     for mesh in range(n_meshes):
         bndf_data.append(mesh_data[mesh].data[n_meshes].data)
         coords.append(mesh_data[mesh].data[n_meshes].get_coordinates())
+    # print(bndf_data[0].shape)
 
     # stitch the data together if there are multiple meshes
 
