@@ -1,5 +1,10 @@
-import fdsreader
-from fdsreader import Simulation, mesh
+import fdsreader as fds
+from fdsreader import Simulation
+import numpy as np
+
+
+DX = 0.1  # m
+DY = 0.1  # m
 
 
 def get_normalized_ros(data):
@@ -14,7 +19,7 @@ def get_normalized_ros(data):
             c) Right of the circle.
     Step 3) Average left + right velocities and divide by center velocity to
             get normalized rate of spread.
-    
+
     NOTE: we need to decide if we are going to do this once or for every time step.
     """
 
@@ -44,7 +49,7 @@ def get_curvature(data):
     """
 
 
-def get_fire_line(data):
+def get_fire_line(data, coords):
     """
     Takes in a boolean array-like object and returns a list of tuples of the coordinates
     of the fire front. The format of coordinates is (x, y).
@@ -61,12 +66,62 @@ def get_fire_line(data):
     data : array-like object
         A 2D array-like object of boolean values. 1 is on fire, 0 is not on fire.
 
+    # TODO: Added this parameter. Is this correct?
+    coords : dict
+        A dictionary object of the (x, y, z) coordinates from the simulation.
+
     Returns
     -------
     fire_line : list of tuples
-        A list of tuples of the coordinates of the fire front. The format of coordinates
+        A list of tuples of the coordinates of the fire front for a given timestep. The format of coordinates
         is (x, y).
     """
+    # data is:
+    # for testing data returning a list of 337 2D arrays of size (123, 301)
+
+    # TODO: need to determine DX and DY from the simulation
+
+    # TODO: store timestep, column, and row in a dictionary
+
+    u_ind = {}
+    v_ind = {}
+
+    # grab the top-most array locations where the data = 1
+    # one array location for each column
+    for timestep in range(len(data)):
+        # for each column in a given timestep
+        for column in range(data[timestep].shape[1]):
+            # for each row in a given timestep
+            for row in range(data[timestep].shape[0]):
+                if data[timestep][row, column] == 1:
+                    u_ind[timestep] = column
+                    v_ind[timestep] = row
+                    break
+    print()
+    # getting dx and dy from the coords dictionary
+    dx = round(coords["x"][1] - coords["x"][0], 5)
+    dy = round(coords["y"][1] - coords["y"][0], 5)
+
+    x_coords = []
+    y_coords = []
+
+    x_coords_data = coords["x"]
+    y_coords_data = coords["y"]
+
+    # convert array locations into (x, y) cartesian coordinates
+    for u in u_ind:
+        x = x_coords_data[u] + DX / 2
+        x_coords.append(x)
+
+    for v in v_ind:
+        # grabbing -v becuase the y coordinates start in bottom left corner; we need to flip the y coordinates
+        y = y_coords_data[-v] - DY / 2
+        y_coords.append(y)
+
+    # combine the x and y coordinates into a list of tuples
+    fire_line = list(zip(x_coords, y_coords))
+
+    return fire_line
 
 
 def get_active_fire_array(data, threshold):
@@ -89,9 +144,24 @@ def get_active_fire_array(data, threshold):
     active_fire_array : array-like object
         An array-like object of boolean values. 1 is on fire, 0 is not on fire.
     """
+    active_fire_array = []
+
+    n_timesteps = len(data[:, 0, 0])
+
+    # active fire array for all timesteps
+    for timestep in range(n_timesteps):
+        # grab the 2D array at that timestep
+        data_for_timestep = data[timestep, :, :]
+        # add active fire array for timestep to list of active fire arrays
+        fire_for_timestep = np.zeros(data_for_timestep.shape)
+        fire_for_timestep[data_for_timestep > threshold] = 1
+        active_fire_array.append(fire_for_timestep)
+
+    # for testing data returning a list of 337 2D arrays of size (123, 301)
+    return active_fire_array
 
 
-def stitch_mesh_data_to_array(list_of_meshes):
+def stitch_mesh_data_to_array(list_of_meshes, coords=None):
     """
     Takes data from an individual mesh and stitches it to a larger array.
 
@@ -111,6 +181,24 @@ def stitch_mesh_data_to_array(list_of_meshes):
     stitched_data : array-like object
         A 3D array-like object of data of a quantity. Dimensions of the array are (time, y, x).
     """
+    # treat as 2D array and iterate over time
+    # for each timestep, stitch the meshes together
+    # iterate over each timestep and stitch these meshes together
+
+    data_array = [arr for arr in list_of_meshes]
+    # concatenate time, x, and y
+    # TODO: reflect this in docstring?
+    stitched_data = np.concatenate([arr[:, :, :]
+                                   for arr in data_array], axis=1)
+
+    if coords:
+        # concatenate x coordinates and add y, z coordinates to coords
+        x_coords = [arr for arr in coords]
+        coords = {"x": x_coords, "y": coords[0]["y"], "z": coords[0]["z"]}
+
+        return stitched_data, coords
+
+    return stitched_data
 
 
 def get_bndf_data(sim, qty):
@@ -133,7 +221,40 @@ def get_bndf_data(sim, qty):
     -------
     data : array-like object
         A 3D array-like object of data of a quantity. Dimensions of the array are (time, y, x).
+
+    # TODO: Added this return. Is this correct?
+    coords : dict
+        A dictionary object of the (x, y, z) coordinates from the simulation.
     """
+
+    # get global boundary data arrays for each individual mesh
+    mesh_data = []
+
+    for mesh in sim.meshes:
+        mesh_data.append(
+            mesh.get_boundary_data(quantity=qty))
+
+    # TODO: should this be capitalized?
+    n_meshes = len(sim.meshes)
+
+    # grabs all data and coordinates for each mesh
+    bndf_data = []
+    coords = []
+
+    for mesh in range(n_meshes):
+        bndf_data.append(mesh_data[mesh].data[n_meshes].data)
+        coords.append(mesh_data[mesh].data[n_meshes].get_coordinates())
+    # print(bndf_data[0].shape)
+
+    # stitch the data together if there are multiple meshes
+
+    # TODO: we need to stitch the x coordinates together if there are multiple meshes
+    if n_meshes > 1:
+        data, coords = stitch_mesh_data_to_array(bndf_data, coords)
+    else:
+        data = bndf_data
+
+    return data, coords
 
 
 def get_slice_data(sim, qty):
@@ -156,7 +277,33 @@ def get_slice_data(sim, qty):
     -------
     data : array-like object
         A 3D array-like object of data of a quantity. Dimensions of the array are (time, y, x).
+
+    # TODO: Added this return. Is this correct?
+    coords : dict
+        A dictionary object of the (x, y, z) coordinates from the simulation.
     """
+    # get slice data arrays for each individual mesh
+    data = []
+    coords = []
+    times = []
+
+    for slice in sim.slices:
+        if str(slice.quantity.name) == qty:
+
+            # Creates a global numpy ndarray from all subslices (of the slice)
+            # xyz is the returned matching coordinate for each value on the generated grid (data).
+            # can return large sparse arrays for some slices
+            slice_data, slice_coords = slice.to_global(
+                return_coordinates=True, masked=True)
+            # times for each slice
+            slice_times = slice.times
+
+            data.append(slice_data)
+            coords.append(slice_coords)
+            times.append(slice_times)
+            break  # this break only grabs the first quantity
+
+    return data, coords
 
 
 def process_simulation(sim_id):
@@ -180,7 +327,27 @@ def process_simulation(sim_id):
 
 
 def main():
-    pass
+
+    sim = fds.Simulation(
+        r"./tests/testing_data/3_meshes/test_data/out_crop_circles_cat.smv")
+
+    # sim = fds.Simulation(
+    #     r"./tests/testing_data/test_data/1_mesh/...........smv")
+
+    # grab boundary data and coordinates
+    bndf_array, coords = get_bndf_data(sim, 'TOTAL HEAT FLUX')
+
+    # determine what cells are on fire for a given timestep
+    # setting 115 kw/m^3 as the threshold for being on fire
+    active_fire_array = get_active_fire_array(bndf_array, 115)
+
+    # grab fire front (x, y) coordinates
+    fire_line = get_fire_line(active_fire_array, coords)
+
+    # stitched = stitch_mesh_data_to_array(hrr_array)
+    data_dict = {"hrr": hrr_array, "mass_flux": mass_flux_array}
+
+    return
     # TODO: Parse arguments and get a simulation ID list
     sim_id_list = parse_arguments(args)
 
