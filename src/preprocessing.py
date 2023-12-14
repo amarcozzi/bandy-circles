@@ -14,9 +14,7 @@ def main(experiment_path, experiment_id):
     grid_search = pd.read_csv(experiment_path / "grid_search.csv")
 
     # Get the wind speed from the grid search using the experiment ID
-    wind_speed = grid_search.loc[
-        grid_search["experiment_id"] == experiment_id, "wind_speed"
-    ].values[0]
+    wind_speed = float(grid_search.iloc[int(experiment_id)]["wind_speed"])
 
     # Create the template for the experiment file
     template_dict = {}
