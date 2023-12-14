@@ -3,14 +3,12 @@
 ! Contact anthonymarcozzi@gmail.com for questions
 ! Generated February 01, 2022
 !================================================
-&HEAD CHID='out_crop_circles', TITLE='EVALUATION TEST' /
+&HEAD CHID='out_crop_circles', TITLE=$title /
 
 !=========================================
 !SPATIAL DOMAIN
-!Domain is 24m x 18m x 20m
-!Voxels have dimensions 0.1x0.1x0.1 m^3
-cSimulation has 12 meshes
-cWith arrangement 3x1x4
+!Domain is 18m x 45m x 20m
+!Voxels have dimensions 0.2m x 0.2m x 0.2m
 !=========================================
 &MESH IJK=90, 225, 100, XB=-9, 9, -12, 33, 0, 20./
 
@@ -35,7 +33,7 @@ cWith arrangement 3x1x4
 !===============
 !WIND PARAMETERS
 !===============
-&WIND SPEED=1.5, DIRECTION=180.0, L=-500, Z_0=0.03 /
+&WIND SPEED=$wind_speed, DIRECTION=180.0, L=-500, Z_0=0.03 /
 
 !===================
 !Ignition Parameters
