@@ -1,6 +1,3 @@
-# ignore .bdf files that generate_bdf_files.py creates as testing data
-*.bdf
-
 # ignore jupyter notebook for generate_bdf_files.py
 /src/generate_bdf_files.ipynb
 
