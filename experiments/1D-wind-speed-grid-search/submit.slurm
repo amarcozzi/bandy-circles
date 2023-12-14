@@ -11,7 +11,15 @@
 #SBATCH --output=output/%a.out                        
 #SBATCH --error=output/%a.err  
 
-# ulimit -s unlimited
-# export OMP_NUM_THREADS=1
-
+echo "Starting job ${SLURM_ARRAY_TASK_ID}"
 echo $SLURM_ARRAY_TASK_ID
+echo $PWD
+
+# Generate the FDS input file
+echo "Generating FDS input file"
+conda activate bandy-circles
+python3 ../../src/preprocessing.py $PWD $SLURM_ARRAY_TASK_ID
+
+# Run FDS
+echo "Running FDS"
+fds "input_${SLURM_ARRAY_TASK_ID}.fds"
