@@ -167,4 +167,4 @@ cython_debug/
 # IDEs
 .idea/
 .vscode/
-.code-workspace
+*.code-workspace
