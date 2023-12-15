@@ -17,22 +17,7 @@ echo $PWD
 
 # Activate conda environment
 echo "Activating conda environment"
-conda ()
-{ 
-    \local cmd="${1-__missing__}";
-    case "$cmd" in 
-        activate | deactivate)
-            __conda_activate "$@"
-        ;;
-        install | update | upgrade | remove | uninstall)
-            __conda_exe "$@" || \return;
-            __conda_reactivate
-        ;;
-        *)
-            __conda_exe "$@"
-        ;;
-    esac
-}
+source ~/miniconda3/etc/profile.d/conda.sh
 
 # Generate the FDS input file
 echo "Generating FDS input file"
