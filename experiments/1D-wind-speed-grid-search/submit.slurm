@@ -22,4 +22,5 @@ python3 ../../src/preprocessing.py $PWD $SLURM_ARRAY_TASK_ID
 
 # Run FDS
 echo "Running FDS"
+cd output
 fds "input_${SLURM_ARRAY_TASK_ID}.fds"
