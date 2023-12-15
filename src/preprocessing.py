@@ -26,7 +26,7 @@ def main(experiment_path, experiment_id):
     # Write the FDS input file using the template
     template_path = TEMPLATE_DIR / "pfm_template.fds"
     output_path = experiment_path / "output"
-    fds_input_path = output_path / f"{template_dict['chid']}.fds"
+    fds_input_path = output_path / f"input_{experiment_id}.fds"
     with open(template_path, "r") as f:
         template = Template(f.read())
         fds_input = template.substitute(template_dict)
