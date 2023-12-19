@@ -7,7 +7,7 @@ CURRENT_DIR = Path(__file__).parent
 TEMPLATE_DIR = CURRENT_DIR / "templates"
 
 
-def main(experiment_path, experiment_id):
+def main(experiment_path, experiment_id, resolution):
     print("Preprocessing")
 
     # Read the grid search CSV file
@@ -24,7 +24,7 @@ def main(experiment_path, experiment_id):
     template_dict["chid"] = f"out_{experiment_id}"
 
     # Write the FDS input file using the template
-    template_path = TEMPLATE_DIR / "pfm_template.fds"
+    template_path = TEMPLATE_DIR / f"pfm_template_{resolution}.fds"
     output_path = experiment_path / "output"
     fds_input_path = output_path / f"input_{experiment_id}.fds"
     with open(template_path, "r") as f:
@@ -40,5 +40,6 @@ if __name__ == "__main__":
     0: Name of the script
     1: Path to the experiment folder
     2: Experiment ID
+    3: Resolution (coarse or fine)
     """
-    main(Path(sys.argv[1]), sys.argv[2])
+    main(Path(sys.argv[1]), sys.argv[2], sys.argv[3])
