@@ -14,8 +14,7 @@
 echo "Starting job ${SLURM_ARRAY_TASK_ID}"
 
 # Create a directory for the output files
-cd output/
-mkdir simulation_$SLURM_ARRAY_TASK_ID
+mkdir output/simulation_$SLURM_ARRAY_TASK_ID
 
 # Activate conda environment
 echo "Activating conda environment"
@@ -28,5 +27,5 @@ python3 ../../../src/preprocess_from_csv.py $PWD $SLURM_ARRAY_TASK_ID
 
 # Run FDS
 echo "Running FDS"
-cd simulation_$SLURM_ARRAY_TASK_ID
+cd output/simulation_$SLURM_ARRAY_TASK_ID
 fds "input_${SLURM_ARRAY_TASK_ID}.fds"
