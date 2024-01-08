@@ -3,16 +3,17 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from scipy.io import FortranFile
 
-# constants
-RADIUS = 1.8288  # m
 
-CONTROL_MASS = 0.5  # kg/m^3
-TREATMENT_MASS = 1.27  # kg/m^3
-
-CONTROL_HEIGHT = 0.6  # m
-TREATMENT_HEIGHT = 0.15  # m
-
-def export_array_to_fds(output_dir: Path | str, name: str, array: np.ndarray, dx: float, dy: float, dz: float, x_coords: np.ndarray = None, y_coords: np.ndarray = None) -> None:
+def export_array_to_fds(
+    output_dir: Path | str,
+    name: str,
+    array: np.ndarray,
+    dx: float,
+    dy: float,
+    dz: float,
+    x_coords: np.ndarray = None,
+    y_coords: np.ndarray = None,
+) -> None:
     """
     Write a 3D numpy array to an FDS bulk density input file
     """
@@ -36,12 +37,17 @@ def export_array_to_fds(output_dir: Path | str, name: str, array: np.ndarray, dx
 
     # Create a FortranFile object for the output file
     output_path = output_dir / f"{name}.bdf"
-    with FortranFile(output_path, 'w') as f:
+    with FortranFile(output_path, "w") as f:
         # write out global bounding voxel faces.
         # (VXMIN,VXMAX,VYMIN,VYMAX,VZMIN,VZMAX)
-        vxbounds = [np.round(np.min(x_coords) - dx / 2, 2), np.round(np.max(x_coords) + dx / 2, 2),
-                    np.round(np.min(y_coords) - dy / 2, 2), np.round(np.max(y_coords) + dy / 2, 2),
-                    np.round(np.min(z_coords) - dz / 2, 2), np.round(np.max(z_coords) + dz / 2, 2)]
+        vxbounds = [
+            np.round(np.min(x_coords) - dx / 2, 2),
+            np.round(np.max(x_coords) + dx / 2, 2),
+            np.round(np.min(y_coords) - dy / 2, 2),
+            np.round(np.max(y_coords) + dy / 2, 2),
+            np.round(np.min(z_coords) - dz / 2, 2),
+            np.round(np.max(z_coords) + dz / 2, 2),
+        ]
         f.write_record(np.array(vxbounds, dtype=np.float64))
 
         # write out voxel resolution (VDX, VDY, VDZ)
@@ -56,13 +62,26 @@ def export_array_to_fds(output_dir: Path | str, name: str, array: np.ndarray, dx
         # (MASS_PER_VOLUME)
         for i, j, k in np.argwhere(bd_data > 0):
             f.write_record(
-                np.array([x_coords[i], y_coords[j], z_coords[k]],
-                         dtype=np.float64))
+                np.array([x_coords[i], y_coords[j], z_coords[k]], dtype=np.float64)
+            )
             f.write_record(np.array(bd_data[i, j, k], dtype=np.float64))
 
 
-def generate_bdf_files(out_path: Path, control_mass: float, treatment_mass: float, xmin=-9, xmax=9, dx=0.1, ymin=-12, ymax=12, dy=0.1):
-    '''
+def generate_bdf_files(
+    out_path: Path,
+    circle_radius: float,
+    control_fuel_height: float,
+    control_fuel_bulk_density: float,
+    treatment_fuel_height: float,
+    treatment_fuel_bulk_density: float,
+    dx: float,
+    dy: float,
+    xmin=-9,
+    xmax=9,
+    ymin=-8,
+    ymax=8,
+):
+    """
     Generate BDF files for the control and treatment areas.
 
     Parameters
@@ -83,31 +102,45 @@ def generate_bdf_files(out_path: Path, control_mass: float, treatment_mass: floa
     Returns
     -------
         None
-    '''
+    """
 
     # x_coords and y_coords cell centered
-    x_coords = np.arange(xmin + dx/2, xmax + dx/2, dx)
-    y_coords = np.arange(ymax - dy/2, ymin - dy/2, -dy)
+    x_coords = np.arange(xmin + dx / 2, xmax + dx / 2, dx)
+    y_coords = np.arange(ymax - dy / 2, ymin - dy / 2, -dy)
+    nx = len(x_coords)
+    ny = len(y_coords)
+    xx, yy = np.meshgrid(x_coords, y_coords, indexing="xy")
 
-    xx, yy = np.meshgrid(x_coords, y_coords, indexing='xy')
+    inside_circle = np.square(xx) + np.square(yy) <= np.square(circle_radius)
 
-    inside_circle = np.square(xx) + np.square(yy) <= np.square(RADIUS)
-
-    ny = inside_circle.shape[0]
-    nx = inside_circle.shape[1]
-
-    control_array = np.ones((ny, nx, 1)) * control_mass
+    control_array = np.ones((ny, nx, 1)) * control_fuel_bulk_density
     control_array[:, :, 0] *= ~inside_circle
 
-    treatment_array = np.ones((ny, nx, 1)) * treatment_mass
+    treatment_array = np.ones((ny, nx, 1)) * treatment_fuel_bulk_density
     treatment_array[:, :, 0] *= inside_circle
 
     export_array_to_fds(
-        out_path, "control", control_array, dx, dy, CONTROL_HEIGHT, x_coords, y_coords)
+        out_path,
+        "control",
+        control_array,
+        dx,
+        dy,
+        control_fuel_height,
+        x_coords,
+        y_coords,
+    )
     export_array_to_fds(
-        out_path, "treatment", treatment_array, dx, dy, TREATMENT_HEIGHT, x_coords, y_coords)
+        out_path,
+        "treatment",
+        treatment_array,
+        dx,
+        dy,
+        treatment_fuel_height,
+        x_coords,
+        y_coords,
+    )
 
 
-if '__main__' == __name__:
+if "__main__" == __name__:
     # test generate_bdf_files
     generate_bdf_files()
