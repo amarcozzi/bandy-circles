@@ -165,3 +165,7 @@ cython_debug/
 .idea/
 .vscode/
 *.code-workspace
+
+# Output files
+*.bdf
+output/
