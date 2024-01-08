@@ -12,7 +12,7 @@
 
 !===============
 !===============
-&TIME T_BEGIN=-5., T_END=60. /
+&TIME T_BEGIN=-5., T_END=120. /
 
 !======================================
 !Ambient Conditions and Level Set Value
@@ -55,24 +55,12 @@
 !====================================
 !FUEL SPECIFICATIONS FOR TREATMENT (CIRCLE) GRASS
 !====================================
-cSURF ID                        = 'TREATMENT'
-      COLOR                     = 'EMERALD GREEN'
-      MATL_ID(1,1:1)            = 'GENERIC VEGETATION'
-      MATL_ID(2,1)              = 'DIRT'
-      THICKNESS(1:2)            = 0.15,0.10
-      MOISTURE_FRACTION(1)      = 0.15
-      MASS_PER_VOLUME(1)        = 1.27
-      DRAG_COEFFICIENT          = 2.8
-      MINIMUM_BURNOUT_TIME      = 10.
-      SURFACE_VOLUME_RATIO(1)   = 6561. /
-
 &SURF ID                      = 'TREATMENT_SURF'
       MATL_ID(1,1)            = 'GENERIC VEGETATION'
       MATL_MASS_FRACTION(1,1) = 1.0
       MOISTURE_FRACTION       = 0.15
       SURFACE_VOLUME_RATIO    = 6561.
       LENGTH                  = 0.10
-      BURN_AWAY               = .TRUE.
       GEOMETRY                = 'CYLINDRICAL' /
 
 cPART ID='TREATMENT_PART', DRAG_COEFFICIENT=2.8, SAMPLING_FACTOR=1, SURF_ID='TREATMENT_SURF',
@@ -84,24 +72,12 @@ cPART ID='TREATMENT_PART', DRAG_COEFFICIENT=2.8, SAMPLING_FACTOR=1, SURF_ID='TRE
 !============================================
 !FUEL SPECIFICATIONS FOR CONTROL (OUTSIDE CIRCLE) GRASS
 !============================================
-cSURF ID                        = 'CONTROL'
-      COLOR                     = 'EMERALD GREEN'
-      MATL_ID(1,1:1)            = 'GENERIC VEGETATION'
-      MATL_ID(2,1)              = 'DIRT'
-      THICKNESS(1:2)            = 0.6,0.10
-      MOISTURE_FRACTION(1)      = 0.15
-      MASS_PER_VOLUME(1)        = 0.50
-      DRAG_COEFFICIENT          = 2.8
-      MINIMUM_BURNOUT_TIME      = 10.
-      SURFACE_VOLUME_RATIO(1)   = 6561. /
-
 &SURF ID                      = 'CONTROL_SURF'
       MATL_ID(1,1)            = 'GENERIC VEGETATION'
       MATL_MASS_FRACTION(1,1) = 1.0
       MOISTURE_FRACTION       = 0.15
       SURFACE_VOLUME_RATIO    = 6561.
       LENGTH                  = 0.10
-      BURN_AWAY               = .TRUE.
       GEOMETRY                = 'CYLINDRICAL' /
 
 cPART ID='CONTROL_PART', DRAG_COEFFICIENT=2.8, SAMPLING_FACTOR=1, SURF_ID='CONTROL_SURF',
@@ -114,7 +90,7 @@ cPART ID='CONTROL_PART', DRAG_COEFFICIENT=2.8, SAMPLING_FACTOR=1, SURF_ID='CONTR
 !===============
 !IGNITION POINTS
 !===============
-&VENT XB=-12, 12, -8, -8.5, 0., 0., SURF_ID='IGNITION' /
+&VENT XB=-12, 12, -7.5, -8., 0., 0., SURF_ID='IGNITION' /
 
 
 !============
@@ -134,6 +110,11 @@ cPART ID='CONTROL_PART', DRAG_COEFFICIENT=2.8, SAMPLING_FACTOR=1, SURF_ID='CONTR
 &SLCF PBZ=0.1, QUANTITY='HRRPUV' /
 &SLCF PBZ=0.1, QUANTITY='TEMPERATURE' /
 &SLCF PBZ=0.1, QUANTITY='INTEGRATED INTENSITY'/
+&SLCF PBZ=0.1, QUANTITY='VELOCITY', VECTOR=T /
+
+&SLCF PBZ=0.2, QUANTITY='VELOCITY', VECTOR=T /
+
+&SLCF PBZ=0.5, QUANTITY='VELOCITY', VECTOR=T /
 
 &SLCF PBZ=1., QUANTITY='VELOCITY', VECTOR=T /
 &SLCF PBZ=1., QUANTITY='HRRPUV' /
@@ -150,20 +131,6 @@ cPART ID='CONTROL_PART', DRAG_COEFFICIENT=2.8, SAMPLING_FACTOR=1, SURF_ID='CONTR
 &DEVC ID='KILL-DEVICE-LEFT', QUANTITY='TOTAL HEAT FLUX', SETPOINT=100, XYZ=-2.8288, 4.8288, 0.05, IOR=3 /
 &DEVC ID='KILL-DEVICE-RIGHT', QUANTITY='TOTAL HEAT FLUX', SETPOINT=100, XYZ=2.8288, 4.8288, 0.05, IOR=3 /
 &DEVC ID='KILL-CIRCLE', QUANTITY='TOTAL HEAT FLUX', SETPOINT=100, XYZ=0., 4.8288, 0.05, IOR=3 /
-
-! Devices below control the MASS FLUX devices one grid point above the circle
-cDEVC ID='LEFT-TOP', QUANTITY='MASS FLUX', SPEC_ID='FUEL VAPOR', XYZ=-2.8288, 2.0288, 0.05, IOR=3 /
-cDEVC ID='RIGHT-TOP', QUANTITY='MASS FLUX', SPEC_ID='FUEL VAPOR', XYZ=2.8288, 2.0288, 0.05, IOR=3 /
-cDEVC ID='CIRCLE-TOP', QUANTITY='MASS FLUX', SPEC_ID='FUEL VAPOR', XYZ=0., 2.0288, 0.05, IOR=3 /
-
-! Devices below control the MASS FLUX devices one grid point below the circle
-cDEVC ID='LEFT-BOTTOM', QUANTITY='MASS FLUX', SPEC_ID='FUEL VAPOR', XYZ=-2.8288, -2.0288, 0.05, IOR=3 /
-cDEVC ID='RIGHT-BOTTOM', QUANTITY='MASS FLUX', SPEC_ID='FUEL VAPOR', XYZ=2.8288, -2.0288, 0.05, IOR=3 /
-cDEVC ID='CIRCLE-BOTTOM', QUANTITY='MASS FLUX', SPEC_ID='FUEL VAPOR', XYZ=0., -2.0288, 0.05, IOR=3 /
-cDEVC ID='CIRCLE-BOTTOM-QUARTER', QUANTITY='MASS FLUX', SPEC_ID='FUEL VAPOR', XYZ=0., -0.9144, 0.05, IOR=3 /
-
-! Device below tests for the presence of mass flux inside of the circle
-cDEVC ID='TREATMENT-MIDDLE', QUANTITY='MASS FLUX', SPEC_ID='FUEL VAPOR', XYZ=0., 0., 0., IOR=3 /
 
 ! Lines below define the kill condition when mass flux activates the kill device conditions
 &CTRL ID='CTRL-KILL-LEFT', FUNCTION_TYPE='KILL', INPUT_ID='KILL-DEVICE-LEFT' /
