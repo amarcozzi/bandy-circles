@@ -1,9 +1,10 @@
 echo "Running experiment: 1D-wind-speed-grid-search"
 
-# Check if the output directory exists
-echo "Removing old simulation files"
-rm out_*
-rm input_*
+# Remove the output directory if it exists
+rm -rf output
+
+# Create the output directory
+mkdir output
 
 # Submit the job to slurm
 sbatch submit.slurm

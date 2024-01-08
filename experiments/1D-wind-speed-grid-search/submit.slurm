@@ -5,15 +5,18 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=5G
-#SBATCH --time=48:00:00
+#SBATCH --time=24:00:00
 #SBATCH --account=umontana_fire_modeling
-#SBATCH --array=0-99%50                             
+#SBATCH --array=0-99%100                             
 #SBATCH --output=output/%a.out                        
 #SBATCH --error=output/%a.err  
 
 echo "Starting job ${SLURM_ARRAY_TASK_ID}"
-echo $SLURM_ARRAY_TASK_ID
-echo $PWD
+
+# Create a directory for the output files
+cd output/
+mkdir $SLURM_ARRAY_TASK_ID
+cd $SLURM_ARRAY_TASK_ID
 
 # Activate conda environment
 echo "Activating conda environment"
@@ -26,5 +29,5 @@ python3 ../../src/preprocess.py $PWD $SLURM_ARRAY_TASK_ID
 
 # Run FDS
 echo "Running FDS"
-cd output
+cd output/$SLURM_ARRAY_TASK_ID
 fds "input_${SLURM_ARRAY_TASK_ID}.fds"
