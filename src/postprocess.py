@@ -1,6 +1,10 @@
-import fdsreader as fds
-from fdsreader import Simulation
 import numpy as np
+import pandas as pd
+import fdsreader as fds
+from tqdm import tqdm
+from pathlib import Path
+from pandas import DataFrame
+from fdsreader import Simulation
 
 
 DX = 0.1  # m
@@ -188,8 +192,7 @@ def stitch_mesh_data_to_array(list_of_meshes, coords=None):
     data_array = [arr for arr in list_of_meshes]
     # concatenate time, x, and y
     # TODO: reflect this in docstring?
-    stitched_data = np.concatenate([arr[:, :, :]
-                                   for arr in data_array], axis=1)
+    stitched_data = np.concatenate([arr[:, :, :] for arr in data_array], axis=1)
 
     if coords:
         # concatenate x coordinates and add y, z coordinates to coords
@@ -231,8 +234,7 @@ def get_bndf_data(sim, qty):
     mesh_data = []
 
     for mesh in sim.meshes:
-        mesh_data.append(
-            mesh.get_boundary_data(quantity=qty))
+        mesh_data.append(mesh.get_boundary_data(quantity=qty))
 
     # TODO: should this be capitalized?
     n_meshes = len(sim.meshes)
@@ -289,12 +291,12 @@ def get_slice_data(sim, qty):
 
     for slice in sim.slices:
         if str(slice.quantity.name) == qty:
-
             # Creates a global numpy ndarray from all subslices (of the slice)
             # xyz is the returned matching coordinate for each value on the generated grid (data).
             # can return large sparse arrays for some slices
             slice_data, slice_coords = slice.to_global(
-                return_coordinates=True, masked=True)
+                return_coordinates=True, masked=True
+            )
             # times for each slice
             slice_times = slice.times
 
@@ -308,8 +310,8 @@ def get_slice_data(sim, qty):
 
 def process_simulation(sim_id):
     pass
-    # TODO: create a simulation object with out_simulation_id.smv file
-    sim = Simulation(sim_id.smv)
+    # create a simulation object with fdsreader
+    sim = Simulation(sim_id)
 
     # TODO: get the simulation data
     hrr_array = get_slice_data(sim, "HRRPUV")
@@ -326,16 +328,43 @@ def process_simulation(sim_id):
     # return outputs
 
 
-def main():
+def postprocess(experiment_directory: str | Path, input_parameters: DataFrame):
+    """
+    This function takes in an experiment directory with a populated output
 
+    Parameters
+    ----------
+    directory : string
+        The path to the directory of simulation output files.
+
+    Returns
+    -------
+    None
+
+    Raises
+    ------
+    ValueError
+        If the directory does not exist.
+    """
+    experiment_directory = Path(experiment_directory)
+    if not experiment_directory.is_dir():
+        raise ValueError(f"Experiment directory {experiment_directory} does not exist.")
+    outputs_directory = experiment_directory / "outputs"
+
+    # Iterate over each simulation in the experiment
+    for sim_id in tqdm(input_parameters.iterrows(), total=len(input_parameters)):
+        pass
+
+def main():
     sim = fds.Simulation(
-        r"./tests/testing_data/3_meshes/test_data/out_crop_circles_cat.smv")
+        r"./tests/testing_data/3_meshes/test_data/out_crop_circles_cat.smv"
+    )
 
     # sim = fds.Simulation(
     #     r"./tests/testing_data/test_data/1_mesh/...........smv")
 
     # grab boundary data and coordinates
-    bndf_array, coords = get_bndf_data(sim, 'TOTAL HEAT FLUX')
+    bndf_array, coords = get_bndf_data(sim, "TOTAL HEAT FLUX")
 
     # determine what cells are on fire for a given timestep
     # setting 115 kw/m^3 as the threshold for being on fire
@@ -360,4 +389,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    postprocess("/home/anthony/Work/UM/bandy-circles/experiments/1D-wind-speed-grid-search")
