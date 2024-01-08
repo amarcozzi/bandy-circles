@@ -42,7 +42,7 @@ def main(experiment_path, simulation_id):
     # Write the FDS input file using the template
     template_path = TEMPLATE_DIR / f"{fuel_model}_template_{resolution}.fds"
     output_path = experiment_path / "output"
-    simulation_path = output_path / f"{simulation_id}"
+    simulation_path = output_path / f"simulation_{simulation_id}"
     fds_input_file_path = simulation_path / f"input_{simulation_id}.fds"
     with open(template_path, "r") as f:
         template = Template(f.read())

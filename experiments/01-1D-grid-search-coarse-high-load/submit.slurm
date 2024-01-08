@@ -15,8 +15,8 @@ echo "Starting job ${SLURM_ARRAY_TASK_ID}"
 
 # Create a directory for the output files
 cd output/
-mkdir $SLURM_ARRAY_TASK_ID
-cd $SLURM_ARRAY_TASK_ID
+mkdir simulation_$SLURM_ARRAY_TASK_ID
+cd simulation_$SLURM_ARRAY_TASK_ID
 
 # Activate conda environment
 echo "Activating conda environment"
@@ -25,7 +25,7 @@ source ~/miniconda3/etc/profile.d/conda.sh
 # Generate the FDS input file
 echo "Generating FDS input file"
 conda activate bandy-circles
-python3 ../../src/preprocess.py $PWD $SLURM_ARRAY_TASK_ID
+python3 ../../src/preprocess_from_csv.py $PWD $SLURM_ARRAY_TASK_ID
 
 # Run FDS
 echo "Running FDS"
