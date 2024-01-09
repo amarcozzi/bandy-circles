@@ -2,8 +2,8 @@
     "resolution": "coarse",
     "fuel_model": "pfm",
     "circle_radius": 1.8288,
-    "control_fuel_bulk_density": 0.5,
+    "control_fuel_load": 0.31,
     "control_fuel_height": 0.6096,
-    "treatment_fuel_bulk_density": 2.0,
+    "treatment_fuel_load": 0.155,
     "treatment_fuel_height": 0.1524
 }

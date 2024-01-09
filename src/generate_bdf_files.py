@@ -71,9 +71,9 @@ def generate_bdf_files(
     out_path: Path,
     circle_radius: float,
     control_fuel_height: float,
-    control_fuel_bulk_density: float,
+    control_fuel_load: float,
     treatment_fuel_height: float,
-    treatment_fuel_bulk_density: float,
+    treatment_fuel_load: float,
     dx: float,
     dy: float,
     xmin=-9,
@@ -104,20 +104,24 @@ def generate_bdf_files(
         None
     """
 
-    # x_coords and y_coords cell centered
     x_coords = np.arange(xmin + dx / 2, xmax + dx / 2, dx)
     y_coords = np.arange(ymax - dy / 2, ymin - dy / 2, -dy)
     nx = len(x_coords)
     ny = len(y_coords)
     xx, yy = np.meshgrid(x_coords, y_coords, indexing="xy")
-
     inside_circle = np.square(xx) + np.square(yy) <= np.square(circle_radius)
 
-    control_array = np.ones((ny, nx, 1)) * control_fuel_bulk_density
-    control_array[:, :, 0] *= ~inside_circle
+    # Convert fuel load from kg/m^2 to kg/m^3 to get bulk density
+    control_fuel_bulk_density = control_fuel_load / control_fuel_height
+    treatment_fuel_bulk_density = treatment_fuel_load / treatment_fuel_height
 
+    # Apply the control bulk density to the control grid
+    control_array = np.ones((ny, nx, 1)) * control_fuel_bulk_density
+    control_array[:, :, 0] *= ~inside_circle  # Remove fuel inside the circle
+
+    # Apply the treatment bulk density to the treatment grid
     treatment_array = np.ones((ny, nx, 1)) * treatment_fuel_bulk_density
-    treatment_array[:, :, 0] *= inside_circle
+    treatment_array[:, :, 0] *= inside_circle  # Remove fuel outside the circle
 
     export_array_to_fds(
         out_path,

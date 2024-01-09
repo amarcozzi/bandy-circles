@@ -24,9 +24,9 @@ def main(experiment_path, simulation_id):
     # Try and read the circle, control, and treatment data from the config file.
     # If it doesn't exist, data will come from the parameters CSV file.
     control_fuel_height = config.get("control_fuel_height")
-    control_fuel_bulk_density = config.get("control_fuel_bulk_density")
+    control_fuel_load = config.get("control_fuel_load")
     treatment_fuel_height = config.get("treatment_fuel_height")
-    treatment_fuel_bulk_density = config.get("treatment_fuel_bulk_density")
+    treatment_fuel_load = config.get("treatment_fuel_load")
     circle_radius = config.get("circle_radius")
 
     # Read data from the parameters CSV file
@@ -63,9 +63,9 @@ def main(experiment_path, simulation_id):
             out_path=simulation_path,
             circle_radius=circle_radius,
             control_fuel_height=control_fuel_height,
-            control_fuel_bulk_density=control_fuel_bulk_density,
+            control_fuel_load=control_fuel_load,
             treatment_fuel_height=treatment_fuel_height,
-            treatment_fuel_bulk_density=treatment_fuel_bulk_density,
+            treatment_fuel_load=treatment_fuel_load,
             dx=dx,
             dy=dy,
         )
