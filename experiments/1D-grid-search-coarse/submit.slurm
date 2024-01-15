@@ -7,7 +7,7 @@
 #SBATCH --mem=5G
 #SBATCH --time=24:00:00
 #SBATCH --account=umontana_fire_modeling
-#SBATCH --array=0-99%100                             
+#SBATCH --array=0-299%150                             
 #SBATCH --output=output/%a.out                        
 #SBATCH --error=output/%a.err  
 
