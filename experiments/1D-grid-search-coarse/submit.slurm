@@ -6,7 +6,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=5G
 #SBATCH --time=24:00:00
-#SBATCH --partition=hgcpu
+#SBATCH --partition=cpu(all)
 #SBATCH --account=umontana_fire_modeling
 #SBATCH --array=0-299%150                             
 #SBATCH --output=output/%a.out                        
