@@ -15,27 +15,36 @@ def main(experiment_path, simulation_id):
     if isinstance(experiment_path, str):
         experiment_path = Path(experiment_path)
 
-    # Read the configuration JSON file
-    with open(experiment_path / "config.json") as f:
-        config = json.load(f)
-    resolution = config["resolution"]
-    fuel_model = config["fuel_model"]
-
-    # Try and read the circle, control, and treatment data from the config file.
-    # If it doesn't exist, data will come from the parameters CSV file.
-    control_fuel_height = config.get("control_fuel_height")
-    control_fuel_load = config.get("control_fuel_load")
-    treatment_fuel_height = config.get("treatment_fuel_height")
-    treatment_fuel_load = config.get("treatment_fuel_load")
-    circle_radius = config.get("circle_radius")
-
     # Read data from the parameters CSV file
     parameters_df = pd.read_csv(experiment_path / "parameters.csv")
-    wind_speed = float(parameters_df.iloc[int(simulation_id)]["wind_speed"])
+    sim_params = parameters_df.iloc[simulation_id]
+    wind_speed = sim_params["wind_speed"]
+    control_fuel_height = sim_params["control_fuel_height"]
+    control_fuel_load = sim_params["control_fuel_load"]
+    control_fuel_moisture_content = sim_params["control_fuel_moisture_content"]
+    control_fuel_sav = sim_params["control_sav"]
+    treatment_fuel_height = sim_params["treatment_fuel_height"]
+    treatment_fuel_load = sim_params["treatment_fuel_load"]
+    treatment_fuel_moisture_content = sim_params["treatment_fuel_moisture_content"]
+    treatment_fuel_sav = sim_params["treatment_sav"]
+    circle_radius = sim_params["circle_radius"]
+    fuel_model = sim_params["fuel_model"]
+    resolution = sim_params["resolution"]
 
     # Create the template for the simulation file
     template_dict = {}
     template_dict["wind_speed"] = wind_speed
+    template_dict["control_fuel_height"] = control_fuel_height
+    template_dict["control_fuel_load"] = control_fuel_load
+    template_dict["control_fuel_moisture_content"] = control_fuel_moisture_content
+    template_dict["control_fuel_sav"] = control_fuel_sav
+    template_dict["treatment_fuel_height"] = treatment_fuel_height
+    template_dict["treatment_fuel_load"] = treatment_fuel_load
+    template_dict["treatment_fuel_moisture_content"] = treatment_fuel_moisture_content
+    template_dict["treatment_fuel_sav"] = treatment_fuel_sav
+    template_dict["circle_radius"] = circle_radius
+    template_dict["fuel_model"] = fuel_model
+    template_dict["resolution"] = resolution
     template_dict["title"] = f"Experiment iteration: {simulation_id}"
     template_dict["chid"] = f"out_{simulation_id}"
 
@@ -82,6 +91,6 @@ if __name__ == "__main__":
         main(Path(sys.argv[1]), sys.argv[2])
     except IndexError:
         main(
-            "/home/anthony/Work/UM/bandy-circles/experiments/1D-wind-speed-grid-search",
+            "/home/anthony/Work/UM/bandy-circles/experiments/1D-grid-search-coarse",
             0,
         )
