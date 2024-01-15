@@ -17,6 +17,7 @@ def main(experiment_path, simulation_id):
 
     # Read data from the parameters CSV file
     parameters_df = pd.read_csv(experiment_path / "parameters.csv")
+    simulation_id = int(simulation_id)
     sim_params = parameters_df.iloc[simulation_id]
     wind_speed = sim_params["wind_speed"]
     control_fuel_height = sim_params["control_fuel_height"]
