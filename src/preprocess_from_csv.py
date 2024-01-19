@@ -49,6 +49,13 @@ def main(experiment_path, simulation_id):
     template_dict["title"] = f"Experiment iteration: {simulation_id}"
     template_dict["chid"] = f"out_{simulation_id}"
 
+    # Calculate the mass per volume for the fuel models if using BFM
+    if fuel_model == "bfm":
+        treatment_mass_per_volume = treatment_fuel_load / treatment_fuel_height
+        control_mass_per_volume = control_fuel_load / control_fuel_height
+        template_dict["treatment_mass_per_volume"] = treatment_mass_per_volume
+        template_dict["control_mass_per_volume"] = control_mass_per_volume
+
     # Write the FDS input file using the template
     template_path = TEMPLATE_DIR / f"{fuel_model}_template_{resolution}.fds"
     output_path = experiment_path / "output"
