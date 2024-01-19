@@ -58,7 +58,7 @@
 &SURF ID                      = 'TREATMENT_SURF'
       MATL_ID(1,1)            = 'GENERIC VEGETATION'
       MATL_MASS_FRACTION(1,1) = 1.0
-      MOISTURE_FRACTION       = 0.15
+      MOISTURE_FRACTION       = $treatment_fuel_moisture_content
       SURFACE_VOLUME_RATIO    = $treatment_sav
       LENGTH                  = 0.10
       GEOMETRY                = 'CYLINDRICAL' /
@@ -82,7 +82,7 @@
 &SURF ID                      = 'CONTROL_SURF'
       MATL_ID(1,1)            = 'GENERIC VEGETATION'
       MATL_MASS_FRACTION(1,1) = 1.0
-      MOISTURE_FRACTION       = 0.15
+      MOISTURE_FRACTION       = $control_fuel_moisture_content
       SURFACE_VOLUME_RATIO    = $control_sav
       LENGTH                  = 0.10
       GEOMETRY                = 'CYLINDRICAL' /
