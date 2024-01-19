@@ -59,7 +59,7 @@
       MATL_ID(1,1)            = 'GENERIC VEGETATION'
       MATL_MASS_FRACTION(1,1) = 1.0
       MOISTURE_FRACTION       = 0.15
-      SURFACE_VOLUME_RATIO    = 6561.
+      SURFACE_VOLUME_RATIO    = $treatment_sav
       LENGTH                  = 0.10
       GEOMETRY                = 'CYLINDRICAL' /
 
@@ -83,7 +83,7 @@
       MATL_ID(1,1)            = 'GENERIC VEGETATION'
       MATL_MASS_FRACTION(1,1) = 1.0
       MOISTURE_FRACTION       = 0.15
-      SURFACE_VOLUME_RATIO    = 6561.
+      SURFACE_VOLUME_RATIO    = $control_sav
       LENGTH                  = 0.10
       GEOMETRY                = 'CYLINDRICAL' /
 
