@@ -38,11 +38,11 @@ def main(experiment_path, simulation_id):
     template_dict["control_fuel_height"] = control_fuel_height
     template_dict["control_fuel_load"] = control_fuel_load
     template_dict["control_fuel_moisture_content"] = control_fuel_moisture_content
-    template_dict["control_fuel_sav"] = control_fuel_sav
+    template_dict["control_sav"] = control_fuel_sav
     template_dict["treatment_fuel_height"] = treatment_fuel_height
     template_dict["treatment_fuel_load"] = treatment_fuel_load
     template_dict["treatment_fuel_moisture_content"] = treatment_fuel_moisture_content
-    template_dict["treatment_fuel_sav"] = treatment_fuel_sav
+    template_dict["treatment_sav"] = treatment_fuel_sav
     template_dict["circle_radius"] = circle_radius
     template_dict["fuel_model"] = fuel_model
     template_dict["resolution"] = resolution
