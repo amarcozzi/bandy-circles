@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=1d_parameter_sweep
+#SBATCH --job-name=1D-coarse
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
