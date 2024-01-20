@@ -1,0 +1,32 @@
+{
+    "resolution": [
+        "coarse",
+        "fine"
+    ],
+    "fuel_model": [
+        "bfm",
+        "pfm"
+    ],
+    "circle_radius": 1.8288,
+    "control_fuel_height": 0.6096,
+    "treatment_fuel_height": 0.1524,
+    "control_fuel_moisture_content": 0.15,
+    "treatment_fuel_moisture_content": 0.15,
+    "control_sav": 6561,
+    "treatment_sav": 6561,
+    "fuel_load": {
+        "high": 0.31,
+        "medium": 0.19,
+        "low": 0.07
+    },
+    "fuel_load_ratios": {
+        "min": 0.5,
+        "max": 0.5,
+        "number_of_samples": 1
+    },
+    "wind_speed": {
+        "min": 0.5,
+        "max": 5.0,
+        "number_of_samples": 50
+    }
+}
