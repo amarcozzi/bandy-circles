@@ -1,10 +1,10 @@
 {
     "resolution": [
-        "coarse"
+        "fine"
     ],
     "fuel_model": [
-        "pfm",
-        "bfm"
+        "bfm",
+        "pfm"
     ],
     "circle_radius": 1.8288,
     "control_fuel_height": 0.6096,
