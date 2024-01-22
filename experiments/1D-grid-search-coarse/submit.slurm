@@ -8,7 +8,7 @@
 #SBATCH --time=24:00:00
 #SBATCH --partition=cpu(all)
 #SBATCH --account=umontana_fire_modeling
-#SBATCH --array=0-299%100                             
+#SBATCH --array=0-299%150                             
 #SBATCH --output=output/%a.out                        
 #SBATCH --error=output/%a.err  
 
