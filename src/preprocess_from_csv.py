@@ -32,6 +32,12 @@ def main(experiment_path, simulation_id):
     fuel_model = sim_params["fuel_model"]
     resolution = sim_params["resolution"]
 
+    # Get the correct number of cells for the resolution
+    i = 180 if resolution == "fine" else 90
+    j = 200 if resolution == "fine" else 100
+    k = 100 if resolution == "fine" else 50
+    ijk_lines = f"{i}, {j}, {k}"
+
     # Create the template for the simulation file
     template_dict = {}
     template_dict["wind_speed"] = wind_speed
@@ -45,7 +51,7 @@ def main(experiment_path, simulation_id):
     template_dict["treatment_sav"] = treatment_fuel_sav
     template_dict["circle_radius"] = circle_radius
     template_dict["fuel_model"] = fuel_model
-    template_dict["resolution"] = resolution
+    template_dict["ijk_lines"] = ijk_lines
     template_dict["title"] = f"Experiment iteration: {simulation_id}"
     template_dict["chid"] = f"out_{simulation_id}"
 
@@ -57,7 +63,7 @@ def main(experiment_path, simulation_id):
         template_dict["control_mass_per_volume"] = control_mass_per_volume
 
     # Write the FDS input file using the template
-    template_path = TEMPLATE_DIR / f"{fuel_model}_template_{resolution}.fds"
+    template_path = TEMPLATE_DIR / f"{fuel_model}_template.fds"
     output_path = experiment_path / "output"
     simulation_path = output_path / f"simulation_{simulation_id}"
     fds_input_file_path = simulation_path / f"input_{simulation_id}.fds"
