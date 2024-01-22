@@ -1,31 +1,128 @@
+import sys
 import numpy as np
 import pandas as pd
 import fdsreader as fds
+import matplotlib.pyplot as plt
 from tqdm import tqdm
 from pathlib import Path
+from numpy import ndarray
 from pandas import DataFrame
 from fdsreader import Simulation
 
 
-DX = 0.1  # m
-DY = 0.1  # m
+ON_FIRE_THRESHOLD = 50  # kW/m^2 for TOTAL HEAT FLUX
 
 
-def get_normalized_ros(data):
+def get_normalized_ros(data, times, coords, circle_radius):
     """
     Algorithm:
 
-    Step 1) get a raster of boolean values. 1 is on fire, 0 is not on fire.
-            NEED: Some threashold value for on fire/not on fire
-    Step 2) Compute velocity at the following points:
+    Step 1) Compute velocity at the following points:
             a) Through the center of the circle
             b) Left of the circle.
             c) Right of the circle.
-    Step 3) Average left + right velocities and divide by center velocity to
-            get normalized rate of spread.
-
-    NOTE: we need to decide if we are going to do this once or for every time step.
+    Step 2) Average left + right velocities and divide by velocity through the
+            treatment to get normalized rate of spread.
     """
+    # Get the 1D rate of spread one radius length to the left of the edge of the circle
+    left_point_start = (-2 * circle_radius, -circle_radius)
+    left_point_end = (-2 * circle_radius, 0)
+    left_control_ros = get_1D_ros_along_ray(
+        data, times, coords, left_point_start, left_point_end
+    )
+
+    # Get the 1D rate of spread one radius length to the right of the edge of the circle
+    right_point_start = (2 * circle_radius, -circle_radius)
+    right_point_end = (2 * circle_radius, 0)
+    right_control_ros = get_1D_ros_along_ray(
+        data, times, coords, right_point_start, right_point_end
+    )
+
+    # Get the 1D rate of spread through the center of the circle
+    center_point_start = (0, -circle_radius)
+    center_point_end = (0, 0)
+    treatment_ros = get_1D_ros_along_ray(
+        data, times, coords, center_point_start, center_point_end
+    )
+
+    # Average the left and right ros
+    control_ros = (left_control_ros + right_control_ros) / 2
+
+    # Normalize the control ros
+    try:
+        normalized_ros = treatment_ros / control_ros
+    except ZeroDivisionError:
+        return 0
+    return normalized_ros
+
+
+def get_control_ros(data, times, coords):
+    """
+    This function calculates the 1D rate of spread through two rays that are on either side of
+    the treatment (circle). The 1D rate of spread is then the average of the two rays.
+    """
+    # Calculate the 1D ros from (-2, -6) to (-2, 0)
+    left_ros = get_1D_ros_along_ray(data, times, coords, (-2, -6), (-2, 0))
+
+    # Calculate the 1D ros from (2, -6) to (2, 0)
+    right_ros = get_1D_ros_along_ray(data, times, coords, (2, -6), (2, 0))
+
+    # Average the left and right ros
+    ros = (left_ros + right_ros) / 2
+
+    return ros
+
+
+def get_1D_ros_along_ray(
+    fire: ndarray, times: ndarray, coords: dict, start_point: float, end_point: float
+) -> float:
+    """
+    This function calculates the 1D rate of spread along a ray that is on either side of
+    the treatment (circle). The 1D rate of spread is then the average of the two rays.
+    """
+    # Find the cell index of the start and end points
+    i_start, j_start = get_cell_index(coords, start_point)
+    i_end, j_end = get_cell_index(coords, end_point)
+
+    # Find the first time that the fire front reaches the start point
+    start_time = get_time_of_arrival(fire, times, i_start, j_start)
+
+    # Find the first time that the fire front reaches the end point
+    end_time = get_time_of_arrival(fire, times, i_end, j_end)
+
+    # This case checks if the fire front never reaches the start or end point
+    if start_time is None or end_time is None:
+        return 0
+
+    # Calculate the 1D rate of spread
+    y_distance = end_point[1] - start_point[1]
+    ros = y_distance / (end_time - start_time)
+
+    return ros
+
+
+def get_cell_index(coords, xy_point):
+    """
+    This function returns the cell index of a given point.
+    """
+    col = np.argmin(np.abs(coords["x"] - xy_point[0]))
+    row = np.argmin(np.abs(coords["y"] - xy_point[1]))
+    return row, col
+
+
+def get_time_of_arrival(fire: np.ndarray, times: np.ndarray, i: int, j: int):
+    """
+    This function returns the first time that the fire front reaches a given cell.
+    fire is a 3D array-like object of boolean values. 1 is on fire, 0 is not on fire.
+    The dimensions of the array are (time, y, x). Times is a 1D array-like object of the
+    times associated with the fire array. The indices of the fire array correspond to the
+    indices of the times array.
+    """
+    t = fire[:, i, j].argmax()
+    if fire[t, i, j] == 1:
+        return times[t]
+    else:
+        return None
 
 
 def get_curvature(data):
@@ -148,20 +245,8 @@ def get_active_fire_array(data, threshold):
     active_fire_array : array-like object
         An array-like object of boolean values. 1 is on fire, 0 is not on fire.
     """
-    active_fire_array = []
+    active_fire_array = np.where(data >= threshold, True, False)
 
-    n_timesteps = len(data[:, 0, 0])
-
-    # active fire array for all timesteps
-    for timestep in range(n_timesteps):
-        # grab the 2D array at that timestep
-        data_for_timestep = data[timestep, :, :]
-        # add active fire array for timestep to list of active fire arrays
-        fire_for_timestep = np.zeros(data_for_timestep.shape)
-        fire_for_timestep[data_for_timestep > threshold] = 1
-        active_fire_array.append(fire_for_timestep)
-
-    # for testing data returning a list of 337 2D arrays of size (123, 301)
     return active_fire_array
 
 
@@ -230,33 +315,19 @@ def get_bndf_data(sim, qty):
         A dictionary object of the (x, y, z) coordinates from the simulation.
     """
 
-    # get global boundary data arrays for each individual mesh
-    mesh_data = []
-
     for mesh in sim.meshes:
-        mesh_data.append(mesh.get_boundary_data(quantity=qty))
+        boundary = mesh.get_boundary_data(quantity=qty)
 
-    # TODO: should this be capitalized?
-    n_meshes = len(sim.meshes)
+        # fdsreader returns data in (time, x, y) (this makes array operations difficult)
+        data = boundary.data[boundary.orientations[0]].data
 
-    # grabs all data and coordinates for each mesh
-    bndf_data = []
-    coords = []
+        # Make the data (time, y, x) so that array operations make sense
+        data = np.swapaxes(data, 1, 2)
 
-    for mesh in range(n_meshes):
-        bndf_data.append(mesh_data[mesh].data[n_meshes].data)
-        coords.append(mesh_data[mesh].data[n_meshes].get_coordinates())
-    # print(bndf_data[0].shape)
+        times = boundary.times
+        coords = boundary.data[boundary.orientations[0]].get_coordinates()
 
-    # stitch the data together if there are multiple meshes
-
-    # TODO: we need to stitch the x coordinates together if there are multiple meshes
-    if n_meshes > 1:
-        data, coords = stitch_mesh_data_to_array(bndf_data, coords)
-    else:
-        data = bndf_data
-
-    return data, coords
+    return data, times, coords
 
 
 def get_slice_data(sim, qty):
@@ -308,27 +379,31 @@ def get_slice_data(sim, qty):
     return data, coords
 
 
-def process_simulation(sim_id):
-    pass
+def process_simulation(sim_dir: Path, sim_params: dict, make_plots: bool = False):
     # create a simulation object with fdsreader
-    sim = Simulation(sim_id)
+    sim = Simulation(str(sim_dir))
 
-    # TODO: get the simulation data
-    hrr_array = get_slice_data(sim, "HRRPUV")
-    mass_flux_array = get_slice_data(sim, "MASS FLUX")
-    data_dict = {"hrr": hrr_array, "mass_flux": mass_flux_array}
+    # Get the boundary data, times, and coordinates
+    bndf_array, times, coords = get_bndf_data(sim, "TOTAL HEAT FLUX")
+    coords["dx"] = round(coords["x"][1] - coords["x"][0], 1)
+    coords["dy"] = round(coords["y"][1] - coords["y"][0], 1)
 
-    # TODO: Take the data and get outputs
-    for qty, data in data_dict.items():
-        min_normalized_ros = get_normalized_ros(data)
-        curvature = get_curvature(data)
+    # Determine what cells are on fire for a given timestep
+    active_fire_mask = get_active_fire_array(bndf_array, ON_FIRE_THRESHOLD)
 
-        # TODO: Do something with the outputs like take the minimum
+    # Compute outputs
+    control_ros = get_control_ros(active_fire_mask, times, coords)
+    normalized_ros = get_normalized_ros(
+        active_fire_mask, times, coords, sim_params["circle_radius"]
+    )
 
-    # return outputs
+    # Add outputs to a dictionary
+    outputs = {"CONTROL_ROS": control_ros, "NORMALIZED_ROS": normalized_ros}
+
+    return outputs
 
 
-def postprocess(experiment_directory: str | Path, input_parameters: DataFrame):
+def postprocess(experiment_directory: str | Path, outputs_directory: str | Path = None):
     """
     This function takes in an experiment directory with a populated output
 
@@ -346,47 +421,48 @@ def postprocess(experiment_directory: str | Path, input_parameters: DataFrame):
     ValueError
         If the directory does not exist.
     """
-    experiment_directory = Path(experiment_directory)
+    if isinstance(experiment_directory, str):
+        experiment_directory = Path(experiment_directory)
     if not experiment_directory.is_dir():
         raise ValueError(f"Experiment directory {experiment_directory} does not exist.")
-    outputs_directory = experiment_directory / "outputs"
+
+    if outputs_directory is None:
+        outputs_directory = experiment_directory / "outputs"
+    if isinstance(outputs_directory, str):
+        outputs_directory = Path(outputs_directory)
+    if not outputs_directory.is_dir():
+        raise ValueError(f"Outputs directory {outputs_directory} does not exist.")
+
+    # Load the parameters.csv file into a dataframe
+    inputs_df = pd.read_csv(experiment_directory / "parameters.csv")
+
+    # Make a copy of the input parameters dataframe
+    outputs_dict = {}
 
     # Iterate over each simulation in the experiment
-    for sim_id in tqdm(input_parameters.iterrows(), total=len(input_parameters)):
-        pass
+    for row in tqdm(inputs_df.iterrows(), total=len(inputs_df)):
+        sim_params = row[1].to_dict()
+        sim_id = int(sim_params["simulation_id"])
 
-def main():
-    sim = fds.Simulation(
-        r"./tests/testing_data/3_meshes/test_data/out_crop_circles_cat.smv"
-    )
+        simulation_directory = outputs_directory / f"simulation_{sim_id}"
+        sim_outputs = process_simulation(simulation_directory, sim_params)
 
-    # sim = fds.Simulation(
-    #     r"./tests/testing_data/test_data/1_mesh/...........smv")
+        # Add the outputs to the outputs dataframe
+        outputs_dict[sim_id] = sim_outputs
 
-    # grab boundary data and coordinates
-    bndf_array, coords = get_bndf_data(sim, "TOTAL HEAT FLUX")
+    # Combine the inputs and outputs into a single dataframe
+    outputs_df = pd.DataFrame(outputs_dict).T
+    outputs_df = inputs_df.join(outputs_df)
 
-    # determine what cells are on fire for a given timestep
-    # setting 115 kw/m^3 as the threshold for being on fire
-    active_fire_array = get_active_fire_array(bndf_array, 115)
-
-    # grab fire front (x, y) coordinates
-    fire_line = get_fire_line(active_fire_array, coords)
-
-    # stitched = stitch_mesh_data_to_array(hrr_array)
-    data_dict = {"hrr": hrr_array, "mass_flux": mass_flux_array}
-
-    return
-    # TODO: Parse arguments and get a simulation ID list
-    sim_id_list = parse_arguments(args)
-
-    # TODO: Iterate over the simulation ID list and postprocess the simulation
-    for sim_id in sim_id_list:
-        outputs = process_simulation(sim_id)
-
-    # TODO: Save the outputs to the appropriate file (results.csv or simulation_id.out)
-    save_outputs(outputs)
+    # Save the outputs to a csv file
+    outputs_df.to_csv(experiment_directory / "outputs.csv")
 
 
 if __name__ == "__main__":
-    postprocess("/home/anthony/Work/UM/bandy-circles/experiments/1D-wind-speed-grid-search")
+    try:
+        postprocess(sys.argv[1])
+    except IndexError:
+        postprocess(
+            "/home/anthony/Work/UM/bandy-circles/experiments/1D-grid-search-coarse",
+            "/mnt/Data/bandy-circles/output",
+        )
