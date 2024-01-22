@@ -427,7 +427,7 @@ def postprocess(experiment_directory: str | Path, outputs_directory: str | Path 
         raise ValueError(f"Experiment directory {experiment_directory} does not exist.")
 
     if outputs_directory is None:
-        outputs_directory = experiment_directory / "outputs"
+        outputs_directory = experiment_directory / "output"
     if isinstance(outputs_directory, str):
         outputs_directory = Path(outputs_directory)
     if not outputs_directory.is_dir():
@@ -459,9 +459,9 @@ def postprocess(experiment_directory: str | Path, outputs_directory: str | Path 
 
 
 if __name__ == "__main__":
-    try:
-        postprocess(sys.argv[1])
-    except IndexError:
+    if len(sys.argv) > 1:
+        postprocess(*sys.argv[1:])
+    else:
         postprocess(
             "/home/anthony/Work/UM/bandy-circles/experiments/1D-grid-search-coarse",
             "/mnt/Data/bandy-circles/output",
