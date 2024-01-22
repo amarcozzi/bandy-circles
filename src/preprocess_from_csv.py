@@ -34,8 +34,8 @@ def main(experiment_path, simulation_id):
 
     # Get the correct number of cells for the resolution
     i = 180 if resolution == "fine" else 90
-    j = 200 if resolution == "fine" else 100
-    k = 100 if resolution == "fine" else 50
+    j = 450 if resolution == "fine" else 225
+    k = 200 if resolution == "fine" else 100
     ijk_lines = f"{i}, {j}, {k}"
 
     # Create the template for the simulation file
