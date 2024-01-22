@@ -5,10 +5,10 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=20G
-#SBATCH --time=72:00:00
+#SBATCH --time=120:00:00
 #SBATCH --partition=cpu(all)
 #SBATCH --account=umontana_fire_modeling
-#SBATCH --array=0-299%100                          
+#SBATCH --array=0-299%150                          
 #SBATCH --output=output/%a.out                        
 #SBATCH --error=output/%a.err  
 
