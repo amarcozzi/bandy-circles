@@ -20,4 +20,4 @@ source ~/miniconda3/etc/profile.d/conda.sh
 # Generate the FDS input file
 echo "Generating FDS input file"
 conda activate bandy-circles
-python3 ../../src/postprocess.py $PWD
+python3 ../../src/postprocess.py .
