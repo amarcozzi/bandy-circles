@@ -20,3 +20,5 @@ conda activate bandy-circles
 # Run postprocessing script
 echo "Running postprocessing script"
 python3 ../../src/postprocess.py .
+
+echo "Finished"
