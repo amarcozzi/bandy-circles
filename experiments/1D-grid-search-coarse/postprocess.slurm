@@ -15,8 +15,8 @@ echo "Running postprocessing on job ${SLURM_ARRAY_TASK_ID}"
 # Activate conda environment
 echo "Activating conda environment"
 source ~/miniconda3/etc/profile.d/conda.sh
-
-# Generate the FDS input file
-echo "Generating FDS input file"
 conda activate bandy-circles
+
+# Run postprocessing script
+echo "Running postprocessing script"
 python3 ../../src/postprocess.py .
