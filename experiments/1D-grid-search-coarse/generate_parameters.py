@@ -35,7 +35,7 @@ def main():
     simulation_id = 0
     for resolution in config["resolution"]:
         for fuel_model in config["fuel_model"]:
-            for fuel_load_category in ["high", "medium", "low"]:
+            for fuel_load_category in config["fuel_load_category"]:
                 # Generate fuel load values for the control and treatment for each fuel load category
                 control_fuel_load = config["fuel_load"][fuel_load_category]
                 treatment_fuel_loads = np.linspace(
@@ -43,7 +43,6 @@ def main():
                     control_fuel_load * config["fuel_load_ratios"]["max"],
                     config["fuel_load_ratios"]["number_of_samples"],
                 )
-
                 for treatment_fuel_load in treatment_fuel_loads:
                     for wind_speed in wind_speeds:
                         data_list.append(
@@ -54,7 +53,9 @@ def main():
                                 "control_fuel_load": control_fuel_load,
                                 "treatment_fuel_load": treatment_fuel_load,
                                 "control_fuel_height": config["control_fuel_height"],
-                                "treatment_fuel_height": config["treatment_fuel_height"],
+                                "treatment_fuel_height": config[
+                                    "treatment_fuel_height"
+                                ],
                                 "control_fuel_moisture_content": config[
                                     "control_fuel_moisture_content"
                                 ],
