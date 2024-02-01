@@ -32,12 +32,6 @@ def main(experiment_path, simulation_id):
     fuel_model = sim_params["fuel_model"]
     resolution = sim_params["resolution"]
 
-    # Get the correct number of cells for the resolution
-    i = 180 if resolution == "fine" else 90
-    j = 450 if resolution == "fine" else 225
-    k = 200 if resolution == "fine" else 100
-    ijk_lines = f"{i}, {j}, {k}"
-
     # Create the template for the simulation file
     template_dict = {}
     template_dict["wind_speed"] = wind_speed
@@ -51,7 +45,6 @@ def main(experiment_path, simulation_id):
     template_dict["treatment_sav"] = treatment_fuel_sav
     template_dict["circle_radius"] = circle_radius
     template_dict["fuel_model"] = fuel_model
-    template_dict["ijk_lines"] = ijk_lines
     template_dict["title"] = f"Experiment iteration: {simulation_id}"
     template_dict["chid"] = f"out_{simulation_id}"
 
