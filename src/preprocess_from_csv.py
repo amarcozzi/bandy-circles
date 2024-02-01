@@ -56,7 +56,7 @@ def main(experiment_path, simulation_id):
         template_dict["control_mass_per_volume"] = control_mass_per_volume
 
     # Write the FDS input file using the template
-    template_path = TEMPLATE_DIR / f"{fuel_model}_template.fds"
+    template_path = TEMPLATE_DIR / f"{fuel_model}_template_{resolution}.fds"
     output_path = experiment_path / "output"
     simulation_path = output_path / f"simulation_{simulation_id}"
     fds_input_file_path = simulation_path / f"input_{simulation_id}.fds"
