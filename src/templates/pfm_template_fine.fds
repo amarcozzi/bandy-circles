@@ -6,11 +6,25 @@
 !=========================================
 !SPATIAL DOMAIN
 !=========================================
-&MESH IJK=$ijk_lines, XB=-9, 9, -12, 33, 0, 20./
+&MESH IJK=60, 450, 50, XB=-9, -3, -12, 33.,  0., 5. /
+&MESH IJK=60, 450, 50, XB=-3,  3, -12, 33.,  0., 5. /
+&MESH IJK=60, 450, 50, XB= 3,  9, -12, 33.,  0., 5. /
+
+&MESH IJK=60, 450, 50, XB=-9, -3, -12, 33.,  5., 10. /
+&MESH IJK=60, 450, 50, XB=-3,  3, -12, 33.,  5., 10. /
+&MESH IJK=60, 450, 50, XB= 3,  9, -12, 33.,  5., 10. /
+
+&MESH IJK=60, 450, 50, XB=-9, -3, -12, 33.,  10., 15. /
+&MESH IJK=60, 450, 50, XB=-3,  3, -12, 33.,  10., 15. /
+&MESH IJK=60, 450, 50, XB= 3,  9, -12, 33.,  10., 15. /
+
+&MESH IJK=60, 450, 50, XB=-9, -3, -12, 33.,  15., 20. /
+&MESH IJK=60, 450, 50, XB=-3,  3, -12, 33.,  15., 20. /
+&MESH IJK=60, 450, 50, XB= 3,  9, -12, 33.,  15., 20. /
 
 !===============
 !===============
-&TIME T_BEGIN=-5., T_END=45. /
+&TIME T_BEGIN=-5., T_END=60. /
 
 !======================================
 !Ambient Conditions and Level Set Value
@@ -54,45 +68,55 @@
 !FUEL SPECIFICATIONS FOR TREATMENT (CIRCLE) GRASS
 !====================================
 &SURF ID                      = 'TREATMENT_SURF'
-      COLOR                   = 'EMERALD GREEN'
-      MATL_ID(1,1:1)          = 'GENERIC VEGETATION'
-      MATL_ID(2,1)            = 'DIRT'
-      THICKNESS(1:2)          = $treatment_fuel_height, 0.10
-      MOISTURE_FRACTION(1)    = $treatment_fuel_moisture_content
-      MASS_PER_VOLUME(1)      = $treatment_mass_per_volume
-      DRAG_COEFFICIENT        = 2.8
-      MINIMUM_BURNOUT_TIME    = 7.
-      SURFACE_VOLUME_RATIO(1) = $treatment_sav /
+      MATL_ID(1,1)            = 'GENERIC VEGETATION'
+      MATL_MASS_FRACTION(1,1) = 1.0
+      MOISTURE_FRACTION       = $treatment_fuel_moisture_content
+      SURFACE_VOLUME_RATIO    = $treatment_sav
+      LENGTH                  = 0.10
+      GEOMETRY                = 'CYLINDRICAL' /
+
+&PART ID                            = 'TREATMENT_PART'
+      COLOR                         = 'BRICK'
+      DRAG_COEFFICIENT              = 2.8
+      SAMPLING_FACTOR               = 1
+      SURF_ID                       = 'TREATMENT_SURF'
+      STATIC                        = .TRUE.
+      EMBER_PARTICLE                = .TRUE.
+      EMBER_DENSITY_THRESHOLD       = 70
+      EMBER_VELOCITY_THRESHOLD      = 0.
+      TRACK_EMBERS                  = .FALSE. /
+
+&INIT PART_ID='TREATMENT_PART', N_PARTICLES_PER_CELL=1, BULK_DENSITY_FILE='treatment.bdf' /
 
 !============================================
 !FUEL SPECIFICATIONS FOR CONTROL (OUTSIDE CIRCLE) GRASS
 !============================================
 &SURF ID                      = 'CONTROL_SURF'
-      COLOR                   = 'EMERALD GREEN'
-      MATL_ID(1,1:1)          = 'GENERIC VEGETATION'
-      MATL_ID(2,1)            = 'DIRT'
-      THICKNESS(1:2)          = $control_fuel_height, 0.10
-      MOISTURE_FRACTION(1)    = $control_fuel_moisture_content
-      MASS_PER_VOLUME(1)      = $control_mass_per_volume
-      DRAG_COEFFICIENT        = 2.8
-      MINIMUM_BURNOUT_TIME    = 7.
-      SURFACE_VOLUME_RATIO(1) = $control_sav /
+      MATL_ID(1,1)            = 'GENERIC VEGETATION'
+      MATL_MASS_FRACTION(1,1) = 1.0
+      MOISTURE_FRACTION       = $control_fuel_moisture_content
+      SURFACE_VOLUME_RATIO    = $control_sav
+      LENGTH                  = 0.10
+      GEOMETRY                = 'CYLINDRICAL' /
+
+&PART ID                            = 'CONTROL_PART'
+      COLOR                         = 'OLIVE DRAB'
+      DRAG_COEFFICIENT              = 2.8
+      SAMPLING_FACTOR               = 1
+      SURF_ID                       = 'CONTROL_SURF'
+      STATIC                        = .TRUE.
+      EMBER_PARTICLE                = .TRUE.
+      EMBER_DENSITY_THRESHOLD       = 70
+      EMBER_VELOCITY_THRESHOLD      = 0.
+      TRACK_EMBERS                  = .FALSE. /
+
+&INIT PART_ID='CONTROL_PART', N_PARTICLES_PER_CELL=1, BULK_DENSITY_FILE='control.bdf' /
 
 
 !===============
 !IGNITION POINTS
 !===============
-&VENT XB=-9, 9, -7.5, -8., 0., 0., SURF_ID='IGNITION' /
-
-!=============
-!CIRCLE POINTS
-!=============
-&VENT XB=-9, 9, -12, 12, 0., 0., XYZ=0., 0., 0., RADIUS=1.8288, SURF_ID='TREATMENT_SURF' /
-
-!============
-!GRASS POINTS
-!============
-&VENT XB=-9, 9, -12, 33, 0., 0., SURF_ID='CONTROL_SURF' /
+&VENT XB=-12, 12, -7.5, -8., 0., 0., SURF_ID='IGNITION' /
 
 
 !============
@@ -130,9 +154,9 @@ cDEVC XB=-0.5, 0.5, -4.5, 3.5, 0.0, 1.0, QUANTITY='MPUV', PART_ID='CONTROL_PART'
 !DEVICE BELOW KILLS THE SIMULATION AFTER QUANTITY REACHES SETPOINT
 !=================================================================
 ! Devices below control the kill condition for the simulation
-&DEVC ID='KILL-DEVICE-LEFT', QUANTITY='TOTAL HEAT FLUX', SETPOINT=25., XYZ=-2.8288, 4.8288, 0.05, IOR=3 /
-&DEVC ID='KILL-DEVICE-RIGHT', QUANTITY='TOTAL HEAT FLUX', SETPOINT=25., XYZ=2.8288, 4.8288, 0.05, IOR=3 /
-&DEVC ID='KILL-CIRCLE', QUANTITY='TOTAL HEAT FLUX', SETPOINT=25., XYZ=0., 4.8288, 0.05, IOR=3 /
+&DEVC ID='KILL-DEVICE-LEFT', QUANTITY='TOTAL HEAT FLUX', SETPOINT=100, XYZ=-2.8288, 4.8288, 0.05, IOR=3 /
+&DEVC ID='KILL-DEVICE-RIGHT', QUANTITY='TOTAL HEAT FLUX', SETPOINT=100, XYZ=2.8288, 4.8288, 0.05, IOR=3 /
+&DEVC ID='KILL-CIRCLE', QUANTITY='TOTAL HEAT FLUX', SETPOINT=100, XYZ=0., 4.8288, 0.05, IOR=3 /
 
 ! Lines below define the kill condition when mass flux activates the kill device conditions
 &CTRL ID='CTRL-KILL-LEFT', FUNCTION_TYPE='KILL', INPUT_ID='KILL-DEVICE-LEFT' /
