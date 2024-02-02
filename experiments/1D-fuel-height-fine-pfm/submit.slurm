@@ -4,7 +4,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=12
-#SBATCH --mem=40G
+#SBATCH --mem=80G
 #SBATCH --time=72:00:00
 #SBATCH --partition=cpu(all)
 #SBATCH --account=umontana_fire_modeling
