@@ -89,6 +89,7 @@
       COLOR                         = 'OLIVE DRAB'
       DRAG_COEFFICIENT              = 2.8
       SAMPLING_FACTOR               = 1
+      QUANTITIES                    = 'PARTICLE TEMPERATURE', 'PARTICLE MASS',
       SURF_ID                       = 'CONTROL_SURF'
       STATIC                        = .TRUE.
       EMBER_PARTICLE                = .TRUE.
