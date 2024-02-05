@@ -10,10 +10,6 @@ import pandas as pd
 from pathlib import Path
 from itertools import product
 
-NUMBER_SAMPLES = 100
-WIND_SPEED_MIN = 0.5  # m/s
-WIND_SPEED_MAX = 5.0  # m/s
-
 current_file_path = Path(__file__).parent
 
 
