@@ -10,10 +10,6 @@ import pandas as pd
 from pathlib import Path
 from itertools import product
 
-NUMBER_SAMPLES = 100
-WIND_SPEED_MIN = 0.5  # m/s
-WIND_SPEED_MAX = 5.0  # m/s
-
 current_file_path = Path(__file__).parent
 
 
@@ -45,31 +41,37 @@ def main():
                 )
                 for treatment_fuel_load in treatment_fuel_loads:
                     for wind_speed in wind_speeds:
-                        data_list.append(
-                            {
-                                "simulation_id": simulation_id,
-                                "wind_speed": wind_speed,
-                                "fuel_load_category": fuel_load_category,
-                                "control_fuel_load": control_fuel_load,
-                                "treatment_fuel_load": treatment_fuel_load,
-                                "control_fuel_height": config["control_fuel_height"],
-                                "treatment_fuel_height": config[
-                                    "treatment_fuel_height"
-                                ],
-                                "control_fuel_moisture_content": config[
-                                    "control_fuel_moisture_content"
-                                ],
-                                "treatment_fuel_moisture_content": config[
-                                    "treatment_fuel_moisture_content"
-                                ],
-                                "control_sav": config["control_sav"],
-                                "treatment_sav": config["treatment_sav"],
-                                "circle_radius": config["circle_radius"],
-                                "fuel_model": fuel_model,
-                                "resolution": resolution,
-                            }
+                        treatment_fuel_heights = np.linspace(
+                            config["treatment_fuel_height"]["min"],
+                            config["treatment_fuel_height"]["max"],
+                            config["treatment_fuel_height"]["number_of_samples"],
                         )
-                        simulation_id += 1
+                        for treatment_fuel_height in treatment_fuel_heights:
+                            data_list.append(
+                                {
+                                    "simulation_id": simulation_id,
+                                    "wind_speed": wind_speed,
+                                    "fuel_load_category": fuel_load_category,
+                                    "control_fuel_load": control_fuel_load,
+                                    "treatment_fuel_load": treatment_fuel_load,
+                                    "control_fuel_height": config[
+                                        "control_fuel_height"
+                                    ],
+                                    "treatment_fuel_height": treatment_fuel_height,
+                                    "control_fuel_moisture_content": config[
+                                        "control_fuel_moisture_content"
+                                    ],
+                                    "treatment_fuel_moisture_content": config[
+                                        "treatment_fuel_moisture_content"
+                                    ],
+                                    "control_sav": config["control_sav"],
+                                    "treatment_sav": config["treatment_sav"],
+                                    "circle_radius": config["circle_radius"],
+                                    "fuel_model": fuel_model,
+                                    "resolution": resolution,
+                                }
+                            )
+                            simulation_id += 1
 
     # Create the dataframe
     df = pd.DataFrame(data_list)
