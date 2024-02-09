@@ -74,7 +74,7 @@
 
 !===============
 !===============
-&TIME T_BEGIN=-10., T_END=60. /
+&TIME T_BEGIN=-30., T_END=60. /
 
 !======================================
 !Ambient Conditions and Level Set Value
