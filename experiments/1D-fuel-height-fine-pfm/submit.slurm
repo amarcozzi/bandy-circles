@@ -29,4 +29,4 @@ python3 ../../src/preprocess_from_csv.py $PWD $SLURM_ARRAY_TASK_ID
 # Run FDS
 echo "Running FDS"
 cd output/simulation_$SLURM_ARRAY_TASK_ID
-mpirun -n 45 fds "input_${SLURM_ARRAY_TASK_ID}.fds"
+mpirun -n 54 fds "input_${SLURM_ARRAY_TASK_ID}.fds"
