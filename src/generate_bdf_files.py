@@ -76,10 +76,10 @@ def generate_bdf_files(
     treatment_fuel_load: float,
     dx: float,
     dy: float,
-    xmin=-9,
-    xmax=9,
-    ymin=-8,
-    ymax=8,
+    xmin: float,
+    xmax: float,
+    ymin: float,
+    ymax: float,
 ):
     """
     Generate BDF files for the control and treatment areas.

@@ -74,6 +74,10 @@ def main(experiment_path, simulation_id):
     # If the fuel model is pfm, write the bulk density files (.bdf)
     dx = 0.1 if resolution == "fine" else 0.2
     dy = 0.1 if resolution == "fine" else 0.2
+    xmin = -9
+    xmax = 9
+    ymin = -12 if resolution == "fine" else -8
+    ymax = 12 if resolution == "fine" else 8
     if fuel_model == "pfm":
         generate_bdf_files(
             out_path=simulation_path,
@@ -84,6 +88,10 @@ def main(experiment_path, simulation_id):
             treatment_fuel_load=treatment_fuel_load,
             dx=dx,
             dy=dy,
+            xmin=xmin,
+            xmax=xmax,
+            ymin=ymin,
+            ymax=ymax,
         )
 
 
