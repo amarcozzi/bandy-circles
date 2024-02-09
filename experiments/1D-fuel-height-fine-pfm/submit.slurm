@@ -3,8 +3,8 @@
 #SBATCH --job-name=fuel_height
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=12
-#SBATCH --mem=40G
+#SBATCH --cpus-per-task=45
+#SBATCH --mem=100G
 #SBATCH --time=72:00:00
 #SBATCH --partition=cpu(all)
 #SBATCH --account=umontana_fire_modeling
@@ -29,4 +29,4 @@ python3 ../../src/preprocess_from_csv.py $PWD $SLURM_ARRAY_TASK_ID
 # Run FDS
 echo "Running FDS"
 cd output/simulation_$SLURM_ARRAY_TASK_ID
-mpirun -n 12 fds "input_${SLURM_ARRAY_TASK_ID}.fds"
+mpirun -n 45 fds "input_${SLURM_ARRAY_TASK_ID}.fds"
