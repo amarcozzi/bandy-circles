@@ -3,12 +3,12 @@
 #SBATCH --job-name=fuel_height
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=45
+#SBATCH --cpus-per-task=54
 #SBATCH --mem=100G
 #SBATCH --time=72:00:00
 #SBATCH --partition=cpu(all)
 #SBATCH --account=umontana_fire_modeling
-#SBATCH --array=0-11%12                             
+#SBATCH --array=0-11%6                             
 #SBATCH --output=output/%a.out                        
 #SBATCH --error=output/%a.err  
 
