@@ -167,5 +167,4 @@ cython_debug/
 *.code-workspace
 
 # Output files
-*.bdf
 output/
