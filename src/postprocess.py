@@ -211,12 +211,12 @@ def get_fire_line(data, coords):
 
     # convert array locations into (x, y) cartesian coordinates
     for u in u_ind:
-        x = x_coords_data[u] + DX / 2
+        x = x_coords_data[u] + dx / 2
         x_coords.append(x)
 
     for v in v_ind:
         # grabbing -v becuase the y coordinates start in bottom left corner; we need to flip the y coordinates
-        y = y_coords_data[-v] - DY / 2
+        y = y_coords_data[-v] - dy / 2
         y_coords.append(y)
 
     # combine the x and y coordinates into a list of tuples
