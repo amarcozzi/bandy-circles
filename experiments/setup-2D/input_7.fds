@@ -1,0 +1,249 @@
+!===============================================
+! HEADER
+!================================================
+&HEAD CHID='out_7', TITLE='Experiment iteration: 7' /
+
+!=========================================
+!SPATIAL DOMAIN
+!=========================================
+! Level 1
+&MESH IJK=60, 200, 50, XB=-9, -3, -15., 5.,  0., 5. /
+&MESH IJK=60, 200, 50, XB=-3,  3, -15., 5.,  0., 5. /
+&MESH IJK=60, 200, 50, XB= 3,  9, -15., 5.,  0., 5. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 5., 25.,  0., 5. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 5., 25.,  0., 5. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 5., 25.,  0., 5. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 25., 45.,  0., 5. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 25., 45.,  0., 5. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 25., 45.,  0., 5. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 45., 85.,  0., 5. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 45., 85.,  0., 5. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 45., 85.,  0., 5. /
+
+! Level 2
+&MESH IJK=60, 200, 50, XB=-9, -3, -15., 5.,  5., 10. /
+&MESH IJK=60, 200, 50, XB=-3,  3, -15., 5.,  5., 10. /
+&MESH IJK=60, 200, 50, XB= 3,  9, -15., 5.,  5., 10. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 5., 25.,  5., 10. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 5., 25.,  5., 10. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 5., 25.,  5., 10. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 25., 45.,  5., 10. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 25., 45.,  5., 10. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 25., 45.,  5., 10. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 45., 85.,  5., 10. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 45., 85.,  5., 10. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 45., 85.,  5., 10. /
+
+! Level 3
+&MESH IJK=60, 200, 50, XB=-9, -3, -15., 5.,  10., 15. /
+&MESH IJK=60, 200, 50, XB=-3,  3, -15., 5.,  10., 15. /
+&MESH IJK=60, 200, 50, XB= 3,  9, -15., 5.,  10., 15. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 5., 25.,  10., 15. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 5., 25.,  10., 15. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 5., 25.,  10., 15. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 25., 45.,  10., 15. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 25., 45.,  10., 15. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 25., 45.,  10., 15. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 45., 85.,  10., 15. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 45., 85.,  10., 15. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 45., 85.,  10., 15. /
+
+! Level 4
+&MESH IJK=60, 200, 50, XB=-9, -3, -15., 5.,  15., 20. /
+&MESH IJK=60, 200, 50, XB=-3,  3, -15., 5.,  15., 20. /
+&MESH IJK=60, 200, 50, XB= 3,  9, -15., 5.,  15., 20. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 5., 25.,  15., 20. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 5., 25.,  15., 20. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 5., 25.,  15., 20. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 25., 45.,  15., 20. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 25., 45.,  15., 20. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 25., 45.,  15., 20. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 45., 85.,  15., 20. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 45., 85.,  15., 20. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 45., 85.,  15., 20. /
+
+! Level 5
+&MESH IJK=60, 200, 50, XB=-9, -3, -15., 5.,  20., 30. /
+&MESH IJK=60, 200, 50, XB=-3,  3, -15., 5.,  20., 30. /
+&MESH IJK=60, 200, 50, XB= 3,  9, -15., 5.,  20., 30. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 5., 25.,  20., 30. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 5., 25.,  20., 30. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 5., 25.,  20., 30. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 25., 45.,  20., 30. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 25., 45.,  20., 30. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 25., 45.,  20., 30. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 45., 85.,  20., 30. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 45., 85.,  20., 30. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 45., 85.,  20., 30. /
+
+! Level 6
+&MESH IJK=60, 200, 50, XB=-9, -3, -15., 5.,  30., 40. /
+&MESH IJK=60, 200, 50, XB=-3,  3, -15., 5.,  30., 40. /
+&MESH IJK=60, 200, 50, XB= 3,  9, -15., 5.,  30., 40. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 5., 25.,  30., 40. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 5., 25.,  30., 40. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 5., 25.,  30., 40. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 25., 45.,  30., 40. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 25., 45.,  30., 40. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 25., 45.,  30., 40. /
+
+&MESH IJK=60, 200, 50, XB=-9, -3, 45., 85.,  30., 40. /
+&MESH IJK=60, 200, 50, XB=-3,  3, 45., 85.,  30., 40. /
+&MESH IJK=60, 200, 50, XB= 3,  9, 45., 85.,  30., 40. /
+
+!===============
+!===============
+&TIME T_BEGIN=-30., T_END=60. /
+
+!======================================
+!Ambient Conditions and Level Set Value
+!======================================
+&MISC TMPA=14.00, HUMIDITY=47.50, VERBOSE=TRUE /
+
+!===================
+!Boundary Conditions
+!===================
+&VENT MB='XMIN', SURF_ID='MIRROR' /
+&VENT MB='XMAX', SURF_ID='MIRROR' /
+&VENT MB='YMIN', SURF_ID='OPEN' /
+&VENT MB='YMAX', SURF_ID='OPEN' /
+&VENT MB='ZMAX', SURF_ID='OPEN' /
+
+!===============
+!WIND PARAMETERS
+!===============
+&WIND SPEED=3, DIRECTION=180.0, L=-500, Z_0=0.03 /
+
+!===================
+!Ignition Parameters
+!===================
+&SURF ID='IGNITION', HRRPUA=1500., COLOR='RED', TMP_FRONT=100., RAMP_Q='LINEFIRE' /
+&RAMP ID='LINEFIRE', T=0, F=0 /
+&RAMP ID='LINEFIRE', T=1.0, F=1 /
+&RAMP ID='LINEFIRE', T=5.0, F=1 /
+&RAMP ID='LINEFIRE', T=6.0, F=0 /
+
+!==========================================
+!MATERIAL LINES (DEFINE THERMAL PROPERTIES)
+!==========================================
+&CATF OTHER_FILES='vegetation_model.txt' /
+
+&MATL ID='DIRT'
+      CONDUCTIVITY = 0.25
+      SPECIFIC_HEAT = 2.
+      DENSITY = 1300. /
+
+!====================================
+!FUEL SPECIFICATIONS FOR TREATMENT (CIRCLE) GRASS
+!====================================
+&SURF ID                      = 'TREATMENT_SURF'
+      MATL_ID(1,1)            = 'GENERIC VEGETATION'
+      MATL_MASS_FRACTION(1,1) = 1.0
+      MOISTURE_FRACTION       = 0.15
+      SURFACE_VOLUME_RATIO    = 6561
+      LENGTH                  = 0.10
+      GEOMETRY                = 'CYLINDRICAL' /
+
+&PART ID                            = 'TREATMENT_PART'
+      COLOR                         = 'BRICK'
+      DRAG_COEFFICIENT              = 2.8
+      SAMPLING_FACTOR               = 1
+      SURF_ID                       = 'TREATMENT_SURF'
+      QUANTITIES                    = 'PARTICLE TEMPERATURE', 'PARTICLE MASS', 'PARTICLE RADIATIVE HEAT FLUX', 'PARTICLE CONVECTIVE HEAT FLUX', 'PARTICLE TOTAL HEAT FLUX'
+      STATIC                        = .TRUE.
+      EMBER_PARTICLE                = .TRUE.
+      EMBER_DENSITY_THRESHOLD       = 70
+      EMBER_VELOCITY_THRESHOLD      = 0.
+      TRACK_EMBERS                  = .FALSE. /
+
+&INIT PART_ID='TREATMENT_PART', N_PARTICLES_PER_CELL=1, BULK_DENSITY_FILE='treatment.bdf' /
+
+!============================================
+!FUEL SPECIFICATIONS FOR CONTROL (OUTSIDE CIRCLE) GRASS
+!============================================
+&SURF ID                      = 'CONTROL_SURF'
+      MATL_ID(1,1)            = 'GENERIC VEGETATION'
+      MATL_MASS_FRACTION(1,1) = 1.0
+      MOISTURE_FRACTION       = 0.15
+      SURFACE_VOLUME_RATIO    = 6561
+      LENGTH                  = 0.10
+      GEOMETRY                = 'CYLINDRICAL' /
+
+&PART ID                            = 'CONTROL_PART'
+      COLOR                         = 'OLIVE DRAB'
+      DRAG_COEFFICIENT              = 2.8
+      SAMPLING_FACTOR               = 1
+      SURF_ID                       = 'CONTROL_SURF'
+      QUANTITIES                    = 'PARTICLE TEMPERATURE', 'PARTICLE MASS', 'PARTICLE RADIATIVE HEAT FLUX', 'PARTICLE CONVECTIVE HEAT FLUX', 'PARTICLE TOTAL HEAT FLUX'
+      STATIC                        = .TRUE.
+      EMBER_PARTICLE                = .TRUE.
+      EMBER_DENSITY_THRESHOLD       = 70
+      EMBER_VELOCITY_THRESHOLD      = 0.
+      TRACK_EMBERS                  = .FALSE. /
+
+&INIT PART_ID='CONTROL_PART', N_PARTICLES_PER_CELL=1, BULK_DENSITY_FILE='control.bdf' /
+
+
+!===============
+!IGNITION POINTS
+!===============
+&VENT XB=-12, 12, -11.5, -12., 0., 0., SURF_ID='IGNITION' /
+
+
+!============
+!OUTPUT FILES
+!============
+&BNDF QUANTITY='TOTAL HEAT FLUX' /
+
+&SLCF PBX=0., QUANTITY='VELOCITY', VECTOR=T /
+&SLCF PBX=0., QUANTITY='TEMPERATURE' /
+&SLCF PBX=0., QUANTITY='INTEGRATED INTENSITY'/
+&SLCF PBX=0., QUANTITY='HRRPUV'/
+
+&SLCF PBZ=0.1, QUANTITY='HRRPUV' /
+&SLCF PBZ=0.1, QUANTITY='TEMPERATURE' /
+&SLCF PBZ=0.1, QUANTITY='VELOCITY', VECTOR=T /
+
+&SLCF PBZ=0.2, QUANTITY='HRRPUV' /
+&SLCF PBZ=0.2, QUANTITY='TEMPERATURE' /
+&SLCF PBZ=0.2, QUANTITY='VELOCITY', VECTOR=T /
+
+&SLCF PBZ=0.5, QUANTITY='HRRPUV' /
+&SLCF PBZ=0.5, QUANTITY='TEMPERATURE' /
+&SLCF PBZ=0.5, QUANTITY='VELOCITY', VECTOR=T /
+
+&SLCF PBZ=1., QUANTITY='VELOCITY', VECTOR=T /
+&SLCF PBZ=1., QUANTITY='HRRPUV' /
+&SLCF PBZ=1., QUANTITY='KINETIC ENERGY'/
+
+!=================================================================
+!DEVICE BELOW KILLS THE SIMULATION AFTER QUANTITY REACHES SETPOINT
+!=================================================================
+! Devices below control the kill condition for the simulation
+&DEVC ID='KILL-DEVICE-LEFT', QUANTITY='TOTAL HEAT FLUX', SETPOINT=100, XYZ=-2.8288, 8., 0.05, IOR=3 /
+&DEVC ID='KILL-DEVICE-RIGHT', QUANTITY='TOTAL HEAT FLUX', SETPOINT=100, XYZ=2.8288, 8., 0.05, IOR=3 /
+&DEVC ID='KILL-CIRCLE', QUANTITY='TOTAL HEAT FLUX', SETPOINT=100, XYZ=0., 8., 0.05, IOR=3 /
+
+! Lines below define the kill condition when mass flux activates the kill device conditions
+&CTRL ID='CTRL-KILL-LEFT', FUNCTION_TYPE='KILL', INPUT_ID='KILL-DEVICE-LEFT' /
+&CTRL ID='CTRL-KILL-RIGHT', FUNCTION_TYPE='KILL', INPUT_ID='KILL-DEVICE-RIGHT' /
+&CTRL ID='CTRL-KILL-CIRCLE', FUNCTION_TYPE='KILL', INPUT_ID='KILL-CIRCLE' /
+
+&TAIL /
