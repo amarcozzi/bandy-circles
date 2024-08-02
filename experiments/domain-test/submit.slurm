@@ -1,14 +1,12 @@
 #!/bin/bash
 
-#SBATCH --job-name=fds_domain
-#SBATCH --nodes=4
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=76
-#SBATCH --mem=200G
-#SBATCH --time=24:00:00
-#SBATCH --partition=atlas
-#SBATCH --account=umontana_fire_modeling
+#SBATCH -J test_domain        			# Job name
+#SBATCH -o test.out
+#SBATCH --nodes=2-10
+#SBATCH -n 76
+#SBATCH --mem-per-cpu=1G
+#SBATCH -A umontana_fire_modeling
 
 # Run FDS
-module gcc openmpi
+module load gcc openmpi
 srun ~/fds/Build/fds_ompi_gnu_linux input_0.fds
