@@ -6,7 +6,7 @@
 #SBATCH --cpus-per-task=76
 #SBATCH --mem=200G
 #SBATCH --time=24:00:00
-#SBATCH --partition=cpu(all)
+#SBATCH --partition=atlas
 #SBATCH --account=umontana_fire_modeling
 
 # Run FDS
