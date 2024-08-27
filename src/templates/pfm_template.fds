@@ -40,8 +40,8 @@
 !===================
 !Boundary Conditions
 !===================
-&VENT MB='XMIN', SURF_ID='MIRROR' /
-&VENT MB='XMAX', SURF_ID='MIRROR' /
+&VENT PBX=-10., SURF_ID='PERIODIC' /
+&VENT PBX=10., SURF_ID='PERIODIC' /
 &VENT MB='YMIN', SURF_ID='OPEN' /
 &VENT MB='YMAX', SURF_ID='OPEN' /
 &VENT MB='ZMAX', SURF_ID='OPEN' /
