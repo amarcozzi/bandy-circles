@@ -35,6 +35,7 @@
 !Ambient Conditions and Level Set Value
 !======================================
 &MISC TMPA=14.00, HUMIDITY=47.50, VERBOSE=TRUE /
+&RADI RADIATION_ITERATIONS=2 /
 
 !===================
 !Boundary Conditions
