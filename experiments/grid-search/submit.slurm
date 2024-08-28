@@ -1,7 +1,6 @@
 #!/bin/bash
 
 #SBATCH --job-name=grid-search
-#SBATCH --partition=cpu(all)
 #SBATCH --account=umontana_fire_modeling
 #SBATCH --array=0-59%4                           
 #SBATCH --nodes=4
