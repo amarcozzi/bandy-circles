@@ -1,7 +1,6 @@
 from generate_bdf_files import generate_bdf_files
 
 import sys
-import json
 import shutil
 import pandas as pd
 from pathlib import Path
@@ -10,7 +9,6 @@ from string import Template
 CURRENT_DIR = Path(__file__).parent
 TEMPLATE_DIR = CURRENT_DIR / "templates"
 
-
 def main(experiment_path, simulation_id):
     if isinstance(experiment_path, str):
         experiment_path = Path(experiment_path)
@@ -18,35 +16,37 @@ def main(experiment_path, simulation_id):
     # Read data from the parameters CSV file
     parameters_df = pd.read_csv(experiment_path / "parameters.csv")
     simulation_id = int(simulation_id)
-    sim_params = parameters_df.iloc[simulation_id]
+    sim_params = parameters_df.loc[parameters_df['simulation_id'] == simulation_id].iloc[0]
+
+    # Extract parameters
     wind_speed = sim_params["wind_speed"]
     control_fuel_height = sim_params["control_fuel_height"]
     control_fuel_load = sim_params["control_fuel_load"]
     control_fuel_moisture_content = sim_params["control_fuel_moisture_content"]
-    control_fuel_sav = sim_params["control_sav"]
+    control_sav = sim_params["control_sav"]
     treatment_fuel_height = sim_params["treatment_fuel_height"]
     treatment_fuel_load = sim_params["treatment_fuel_load"]
     treatment_fuel_moisture_content = sim_params["treatment_fuel_moisture_content"]
-    treatment_fuel_sav = sim_params["treatment_sav"]
+    treatment_sav = sim_params["treatment_sav"]
     circle_radius = sim_params["circle_radius"]
     fuel_model = sim_params["fuel_model"]
-    resolution = sim_params["resolution"]
 
     # Create the template for the simulation file
-    template_dict = {}
-    template_dict["wind_speed"] = wind_speed
-    template_dict["control_fuel_height"] = control_fuel_height
-    template_dict["control_fuel_load"] = control_fuel_load
-    template_dict["control_fuel_moisture_content"] = control_fuel_moisture_content
-    template_dict["control_sav"] = control_fuel_sav
-    template_dict["treatment_fuel_height"] = treatment_fuel_height
-    template_dict["treatment_fuel_load"] = treatment_fuel_load
-    template_dict["treatment_fuel_moisture_content"] = treatment_fuel_moisture_content
-    template_dict["treatment_sav"] = treatment_fuel_sav
-    template_dict["circle_radius"] = circle_radius
-    template_dict["fuel_model"] = fuel_model
-    template_dict["title"] = f"Experiment iteration: {simulation_id}"
-    template_dict["chid"] = f"out_{simulation_id}"
+    template_dict = {
+        "wind_speed": wind_speed,
+        "control_fuel_height": control_fuel_height,
+        "control_fuel_load": control_fuel_load,
+        "control_fuel_moisture_content": control_fuel_moisture_content,
+        "control_sav": control_sav,
+        "treatment_fuel_height": treatment_fuel_height,
+        "treatment_fuel_load": treatment_fuel_load,
+        "treatment_fuel_moisture_content": treatment_fuel_moisture_content,
+        "treatment_sav": treatment_sav,
+        "circle_radius": circle_radius,
+        "fuel_model": fuel_model,
+        "title": f"Experiment iteration: {simulation_id}",
+        "chid": f"out_{simulation_id}"
+    }
 
     # Calculate the mass per volume for the fuel models if using BFM
     if fuel_model == "bfm":
@@ -56,10 +56,15 @@ def main(experiment_path, simulation_id):
         template_dict["control_mass_per_volume"] = control_mass_per_volume
 
     # Write the FDS input file using the template
-    template_path = TEMPLATE_DIR / f"{fuel_model}_template_{resolution}.fds"
-    output_path = experiment_path / "output"
-    simulation_path = output_path / f"simulation_{simulation_id}"
+    template_path = TEMPLATE_DIR / f"{fuel_model}_template.fds"
+    all_simulations_path = experiment_path / "simulations"
+    if not all_simulations_path.exists():
+        all_simulations_path.mkdir()
+    simulation_path = all_simulations_path / f"simulation_{simulation_id}"
+    if not simulation_path.exists():
+        simulation_path.mkdir()
     fds_input_file_path = simulation_path / f"input_{simulation_id}.fds"
+    
     with open(template_path, "r") as f:
         template = Template(f.read())
         fds_input = template.substitute(template_dict)
@@ -72,12 +77,35 @@ def main(experiment_path, simulation_id):
     shutil.copy(vegetation_model_template_path, vegetation_model_out_path)
 
     # If the fuel model is pfm, write the bulk density files (.bdf)
-    dx = 0.1 if resolution == "fine" else 0.2
-    dy = 0.1 if resolution == "fine" else 0.2
-    xmin = -9
-    xmax = 9
-    ymin = -12 if resolution == "fine" else -8
-    ymax = 12 if resolution == "fine" else 8
+    dx = 0.1
+    dy = 0.1
+    xmin = -10
+    xmax = 10
+    ymin = -12
+    ymax = 12
+    if fuel_model == "pfm":
+        generate_bdf_files(
+            out_path=simulation_path,
+            circle_radius=circle_radius,
+            control_fuel_height=control_fuel_height,
+            control_fuel_load=control_fuel_load,
+            treatment_fuel_height=treatment_fuel_height,
+            treatment_fuel_load=treatment_fuel_load,
+            dx=dx,
+            dy=dy,
+            xmin=xmin,
+            xmax=xmax,
+            ymin=ymin,
+            ymax=ymax,
+        )
+
+    # If the fuel model is pfm, write the bulk density files (.bdf)
+    dx = 0.1
+    dy = 0.1
+    xmin = -10
+    xmax = 10
+    ymin = -12
+    ymax = 12
     if fuel_model == "pfm":
         generate_bdf_files(
             out_path=simulation_path,
