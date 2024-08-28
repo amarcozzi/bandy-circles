@@ -3,7 +3,7 @@ import math
 
 def write_mult_and_mesh_lines(
     I, J, K, x1, x2, y1, y2, z1, z2, MBLKS_i, MBLKS_j, MBLKS_k, name
-):
+) -> int:
     IJK = [I, J, K]
     XB = [x1, x2, y1, y2, z1, z2]
     MBLKS = [MBLKS_i, MBLKS_j, MBLKS_k]
@@ -59,3 +59,5 @@ def write_mult_and_mesh_lines(
 
     print(mult_line)
     print(mesh_line)
+
+    return MBLKS_i * MBLKS_j * MBLKS_k
