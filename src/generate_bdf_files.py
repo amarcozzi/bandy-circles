@@ -147,4 +147,18 @@ def generate_bdf_files(
 
 if "__main__" == __name__:
     # test generate_bdf_files
-    generate_bdf_files()
+    file_path = Path(__file__).resolve().parent
+    generate_bdf_files(
+        file_path,
+        circle_radius=1.8288,
+        control_fuel_height=0.6096,
+        control_fuel_load=0.31,
+        treatment_fuel_height=0.1524,
+        treatment_fuel_load=0.31,
+        dx=0.1,
+        dy=0.1,
+        xmin=-10,
+        xmax=10,
+        ymin=-12,
+        ymax=12,
+    )
