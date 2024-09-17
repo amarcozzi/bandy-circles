@@ -30,7 +30,7 @@ module load intel-oneapi-mpi
 # Run FDS
 echo "Running FDS"
 cd simulations/simulation_$SLURM_ARRAY_TASK_ID
-timeout --signal=SIGTERM 5m srun ~/fds/Build/fds_impi_intel_linux "input_${SLURM_ARRAY_TASK_ID}.fds"
+timeout 5m srun ~/fds/Build/fds_impi_intel_linux "input_${SLURM_ARRAY_TASK_ID}.fds"
 
 if [[ $? -eq 124 || $? -eq 137 ]]; then
     echo "Job failed. Requeueing job ${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
