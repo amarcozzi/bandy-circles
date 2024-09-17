@@ -10,6 +10,17 @@
 #SBATCH --output=simulations/%a.out                        
 #SBATCH --error=simulations/%a.err
 #SBATCH --requeue
+#SBATCH --signal=SIGTERM@90
+
+# Trap function to handle job termination
+cleanup_and_requeue() {
+    echo "Job ${SLURM_ARRAY_TASK_ID} received termination signal. Cleaning up and requeueing."
+    scontrol requeue ${SLURM_JOB_ID}
+    exit 0
+}
+
+# Set the trap
+trap 'cleanup_and_requeue' SIGTERM
 
 echo "Starting job ${SLURM_ARRAY_TASK_ID} with JOB_ID=${SLURM_JOB_ID} on ${SLURM_JOB_NODELIST}"
 
@@ -29,4 +40,14 @@ module load intel-oneapi-mpi
 # Run FDS
 echo "Running FDS"
 cd simulations/simulation_$SLURM_ARRAY_TASK_ID
-srun ~/fds/Build/fds_impi_intel_linux "input_${SLURM_ARRAY_TASK_ID}.fds" || scontrol requeue $SLURM_JOB_ID
+timeout --signal=SIGTERM 270s srun ~/fds/Build/fds_impi_intel_linux "input_${SLURM_ARRAY_TASK_ID}.fds"
+FDS_EXIT_CODE=$?
+
+if [ $FDS_EXIT_CODE -eq 124 ] || [ $FDS_EXIT_CODE -eq 137 ]; then
+    echo "FDS timed out or was terminated. Triggering requeue."
+    scontrol requeue $SLURM_JOB_ID
+else
+    echo "FDS completed with exit code $FDS_EXIT_CODE"
+fi
+
+echo "Job ${SLURM_ARRAY_TASK_ID} completed execution"
