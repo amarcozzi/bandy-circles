@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#SBATCH --requeue
 #SBATCH --job-name=grid-search
 #SBATCH --account=umontana_fire_modeling
 #SBATCH --array=0-59%4                           
@@ -9,7 +8,18 @@
 #SBATCH --mem-per-cpu=1G
 #SBATCH --time=6:00:00
 #SBATCH --output=simulations/%a.out                        
-#SBATCH --error=simulations/%a.err  
+#SBATCH --error=simulations/%a.err
+#SBATCH --requeue
+#SBATCH --signal=SIGTERM@60
+
+# Trap the SIGTERM signal and exit cleanly
+trap 'clean_up' SIGTERM
+
+clean_up() {
+    echo "Job ${SLURM_ARRAY_TASK_ID} received SIGTERM signal. Cleaning up and exiting for requeue."
+    rm -rf ../simulation_${SLURM_ARRAY_TASK_ID}
+    exit 0  # Exit code 0 with --requeue flag will cause Slurm to requeue the job
+}
 
 echo "Starting job ${SLURM_ARRAY_TASK_ID}"
 
