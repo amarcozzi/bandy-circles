@@ -7,11 +7,12 @@
 #SBATCH -n 88
 #SBATCH --mem-per-cpu=1G
 #SBATCH --open-mode=append
-#SBATCH --time=0:20:00
+#SBATCH --time=0:06:00
 #SBATCH --output=simulations/%a.out                        
 #SBATCH --error=simulations/%a.err
+#SBATCH --requeue
 
-echo "Starting job ${SLURM_ARRAY_TASK_ID} with JOB_ID=${SLURM_JOB_ID} on ${SLURM_JOB_NODELIST}"
+echo "Starting job ${SLURM_ARRAY_TASK_ID} with JOB_ID=${SLURM_ARRAY_JOB_ID} on ${SLURM_JOB_NODELIST}"
 
 # Activate conda environment
 echo "Activating conda environment"
@@ -29,8 +30,11 @@ module load intel-oneapi-mpi
 # Run FDS
 echo "Running FDS"
 cd simulations/simulation_$SLURM_ARRAY_TASK_ID
-timeout 10m srun ~/fds/Build/fds_impi_intel_linux "input_${SLURM_ARRAY_TASK_ID}.fds"
+timeout --signal=SIGTERM 5m srun ~/fds/Build/fds_impi_intel_linux "input_${SLURM_ARRAY_TASK_ID}.fds"
 
-if [[ $? == 124 ]]; then
-  scontrol requeue $SLURM_JOB_ID_$SLURM_ARRAY_TASK_ID
+if [[ $? -eq 124 || $? -eq 137 ]]; then
+    echo "Job failed. Requeueing job ${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
+    scontrol requeue ${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}
+else
+    echo "Job ${SLURM_ARRAY_TASK_ID} completed execution"
 fi
