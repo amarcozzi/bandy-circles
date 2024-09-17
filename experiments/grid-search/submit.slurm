@@ -2,12 +2,12 @@
 
 #SBATCH --job-name=grid-search
 #SBATCH --account=umontana_fire_modeling
-#SBATCH --array=0-11%4                           
+#SBATCH --array=0-59%5
 #SBATCH --nodes=4
 #SBATCH -n 88
 #SBATCH --mem-per-cpu=1G
 #SBATCH --open-mode=append
-#SBATCH --time=0:06:00
+#SBATCH --time=8:30:00
 #SBATCH --output=simulations/%a.out                        
 #SBATCH --error=simulations/%a.err
 #SBATCH --requeue
@@ -30,7 +30,7 @@ module load intel-oneapi-mpi
 # Run FDS
 echo "Running FDS"
 cd simulations/simulation_$SLURM_ARRAY_TASK_ID
-timeout 5m srun ~/fds/Build/fds_impi_intel_linux "input_${SLURM_ARRAY_TASK_ID}.fds"
+timeout 8h srun ~/fds/Build/fds_impi_intel_linux "input_${SLURM_ARRAY_TASK_ID}.fds"
 
 if [[ $? -eq 124 || $? -eq 137 ]]; then
     echo "Job failed. Requeueing job ${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}"
