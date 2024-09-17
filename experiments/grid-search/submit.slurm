@@ -6,22 +6,12 @@
 #SBATCH --nodes=4
 #SBATCH -n 88
 #SBATCH --mem-per-cpu=1G
-#SBATCH --time=0:10:00
+#SBATCH --time=0:5:00
 #SBATCH --output=simulations/%a.out                        
 #SBATCH --error=simulations/%a.err
 #SBATCH --requeue
-#SBATCH --signal=SIGTERM@60
 
-# Trap the SIGTERM signal and exit cleanly
-trap 'clean_up' SIGTERM
-
-clean_up() {
-    echo "Job ${SLURM_ARRAY_TASK_ID} received SIGTERM signal. Cleaning up and exiting for requeue."
-    rm -rf ../simulation_${SLURM_ARRAY_TASK_ID}
-    exit 0  # Exit code 0 with --requeue flag will cause Slurm to requeue the job
-}
-
-echo "Starting job ${SLURM_ARRAY_TASK_ID}"
+echo "Starting job ${SLURM_ARRAY_TASK_ID} with JOB_ID=${SLURM_JOB_ID} on ${SLURM_JOB_NODELIST}"
 
 # Activate conda environment
 echo "Activating conda environment"
@@ -39,4 +29,4 @@ module load intel-oneapi-mpi
 # Run FDS
 echo "Running FDS"
 cd simulations/simulation_$SLURM_ARRAY_TASK_ID
-srun ~/fds/Build/fds_impi_intel_linux "input_${SLURM_ARRAY_TASK_ID}.fds"
+srun ~/fds/Build/fds_impi_intel_linux "input_${SLURM_ARRAY_TASK_ID}.fds" || scontrol requeue $SLURM_JOB_ID
