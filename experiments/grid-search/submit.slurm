@@ -2,11 +2,11 @@
 
 #SBATCH --job-name=grid-search
 #SBATCH --account=umontana_fire_modeling
-#SBATCH --array=0-59%4                           
+#SBATCH --array=0-4%4                           
 #SBATCH --nodes=4
 #SBATCH -n 88
 #SBATCH --mem-per-cpu=1G
-#SBATCH --time=6:00:00
+#SBATCH --time=0:10:00
 #SBATCH --output=simulations/%a.out                        
 #SBATCH --error=simulations/%a.err
 #SBATCH --requeue
