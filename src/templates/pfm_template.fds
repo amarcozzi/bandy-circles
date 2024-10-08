@@ -86,6 +86,7 @@
       DRAG_COEFFICIENT              = 2.8
       SAMPLING_FACTOR               = 1
       SURF_ID                       = 'TREATMENT_SURF'
+      QUANTITIES                    = 'PARTICLE TEMPERATURE', 'PARTICLE MASS', ' PARTICLE WEIGHTING FACTOR', 'PARTICLE RADIATIVE HEAT FLUX', 'PARTICLE CONVECTIVE HEAT FLUX', 'PARTICLE TOTAL HEAT FLUX'
       STATIC                        = .TRUE.
       EMBER_PARTICLE                = .TRUE.
       EMBER_DENSITY_THRESHOLD       = 70
@@ -110,6 +111,7 @@
       DRAG_COEFFICIENT              = 2.8
       SAMPLING_FACTOR               = 1
       SURF_ID                       = 'CONTROL_SURF'
+      QUANTITIES                    = 'PARTICLE TEMPERATURE', 'PARTICLE MASS', ' PARTICLE WEIGHTING FACTOR', 'PARTICLE RADIATIVE HEAT FLUX', 'PARTICLE CONVECTIVE HEAT FLUX', 'PARTICLE TOTAL HEAT FLUX'
       STATIC                        = .TRUE.
       EMBER_PARTICLE                = .TRUE.
       EMBER_DENSITY_THRESHOLD       = 70
