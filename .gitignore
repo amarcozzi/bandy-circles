@@ -169,3 +169,4 @@ cython_debug/
 # Output files
 output/
 *.bdf
+simulations/
