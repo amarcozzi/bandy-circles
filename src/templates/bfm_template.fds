@@ -81,7 +81,6 @@
       MOISTURE_FRACTION(1)    = $treatment_fuel_moisture_content
       MASS_PER_VOLUME(1)      = $treatment_mass_per_volume
       DRAG_COEFFICIENT        = 2.8
-      MINIMUM_BURNOUT_TIME    = 7.
       SURFACE_VOLUME_RATIO(1) = $treatment_sav /
 
 !============================================
@@ -95,7 +94,6 @@
       MOISTURE_FRACTION(1)    = $control_fuel_moisture_content
       MASS_PER_VOLUME(1)      = $control_mass_per_volume
       DRAG_COEFFICIENT        = 2.8
-      MINIMUM_BURNOUT_TIME    = 7.
       SURFACE_VOLUME_RATIO(1) = $control_sav /
 
 
@@ -150,9 +148,9 @@
 !DEVICE BELOW KILLS THE SIMULATION AFTER QUANTITY REACHES SETPOINT
 !=================================================================
 ! Devices below control the kill condition for the simulation
-&DEVC ID='KILL-DEVICE-LEFT', QUANTITY='TOTAL HEAT FLUX', SETPOINT=25., XYZ=-2.8288, 4.8288, 0.05, IOR=3 /
-&DEVC ID='KILL-DEVICE-RIGHT', QUANTITY='TOTAL HEAT FLUX', SETPOINT=25., XYZ=2.8288, 4.8288, 0.05, IOR=3 /
-&DEVC ID='KILL-CIRCLE', QUANTITY='TOTAL HEAT FLUX', SETPOINT=25., XYZ=0., 4.8288, 0.05, IOR=3 /
+&DEVC ID='KILL-DEVICE-LEFT', QUANTITY='TOTAL HEAT FLUX', SETPOINT=100, XYZ=-2.8288, 10., 0.05, IOR=3 /
+&DEVC ID='KILL-DEVICE-RIGHT', QUANTITY='TOTAL HEAT FLUX', SETPOINT=100, XYZ=2.8288, 10., 0.05, IOR=3 /
+&DEVC ID='KILL-CIRCLE', QUANTITY='TOTAL HEAT FLUX', SETPOINT=100, XYZ=0., 10., 0.05, IOR=3 /
 
 ! Lines below define the kill condition when mass flux activates the kill device conditions
 &CTRL ID='CTRL-KILL-LEFT', FUNCTION_TYPE='KILL', INPUT_ID='KILL-DEVICE-LEFT' /
