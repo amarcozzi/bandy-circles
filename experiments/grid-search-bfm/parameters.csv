@@ -1,0 +1,2 @@
+simulation_id,fuel_model,control_fuel_height,treatment_fuel_height,control_fuel_moisture_content,treatment_fuel_moisture_content,control_sav,treatment_sav,control_fuel_load,treatment_fuel_load,circle_radius,wind_speed
+0,bfm,0.6,0.1,0.15,0.15,6561,6561,0.31,0.31,1.8,1.22
