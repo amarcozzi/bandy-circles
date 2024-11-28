@@ -117,7 +117,12 @@ def create_particle_data_array(sim: Simulation, sim_dir: Path):
             name=quantity,
         )
 
+    # Remove data before t=0 seconds
+    dataset = dataset.sel(time=dataset.time > 0)
+
+    # Reverse y-axis to match array coordinates
     dataset = dataset.isel(y=slice(None, None, -1))
+
     dataset.to_zarr(sim_dir / "particle_data.zarr", mode="w")
 
     # Create a zip archive of the zarr file
