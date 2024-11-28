@@ -41,11 +41,13 @@ module load intel-oneapi-mpi
 
 # Run FDS
 echo "$(date +%Y-%m-%d' '%H:%M:%S.%N): Running FDS"
+EXPERIMENT_DIR=$PWD
 cd simulations/simulation_$SLURM_ARRAY_TASK_ID
 srun ~/fds/Build/fds_impi_intel_linux "input_${SLURM_ARRAY_TASK_ID}.fds"
 
 # Postprocess outputs
 echo "$(date +%Y-%m-%d' '%H:%M:%S.%N): Postprocessing outputs"
+cd $EXPERIMENT_DIR
 python3 $BANDY_DIR_SRC/process_binary_data_to_zarr.py $PWD $SLURM_ARRAY_TASK_ID && rm out*
 
 echo "$(date +%Y-%m-%d' '%H:%M:%S.%N): Job ${SLURM_ARRAY_TASK_ID} completed execution"
