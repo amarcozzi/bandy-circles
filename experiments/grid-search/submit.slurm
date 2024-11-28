@@ -42,7 +42,7 @@ module load intel-oneapi-mpi
 # Run FDS
 echo "$(date +%Y-%m-%d' '%H:%M:%S.%N): Running FDS"
 # cd simulations/simulation_$SLURM_ARRAY_TASK_ID
-srun ~/fds/Build/fds_impi_intel_linux "{$PWD}/simulations/simulation_${SLURM_ARRAY_TASK_ID}/input_${SLURM_ARRAY_TASK_ID}.fds"
+srun ~/fds/Build/fds_impi_intel_linux "$PWD/simulations/simulation_${SLURM_ARRAY_TASK_ID}/input_${SLURM_ARRAY_TASK_ID}.fds"
 
 # Postprocess outputs
 echo "$(date +%Y-%m-%d' '%H:%M:%S.%N): Postprocessing outputs"
