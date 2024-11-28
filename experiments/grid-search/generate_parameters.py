@@ -18,42 +18,39 @@ def main():
     # Generate all combinations of parameters
     for (
         fuel_model,
+        circle_radius,
         control_fuel_height,
         treatment_fuel_height,
         control_fuel_moisture_content,
         treatment_fuel_moisture_content,
         control_sav,
         treatment_sav,
-        control_fuel_load,
-        treatment_fuel_load,
+        fuel_load,
         wind_speed,
-        circle_radius,
     ) in product(
         config["fuel_model"],
+        config["circle_radius"],
         config["control_fuel_height"],
         config["treatment_fuel_height"],
         config["control_fuel_moisture_content"],
         config["treatment_fuel_moisture_content"],
         config["control_sav"],
         config["treatment_sav"],
-        config["control_fuel_load"],
-        config["treatment_fuel_load"],
+        config["fuel_load"],
         config["wind_speed"],
-        config["circle_radius"],
     ):
         data_list.append(
             {
                 "simulation_id": simulation_id,
                 "fuel_model": fuel_model,
+                "circle_radius": circle_radius,
                 "control_fuel_height": control_fuel_height,
                 "treatment_fuel_height": treatment_fuel_height,
                 "control_fuel_moisture_content": control_fuel_moisture_content,
                 "treatment_fuel_moisture_content": treatment_fuel_moisture_content,
                 "control_sav": control_sav,
                 "treatment_sav": treatment_sav,
-                "control_fuel_load": control_fuel_load,
-                "treatment_fuel_load": treatment_fuel_load,
-                "circle_radius": circle_radius,
+                "fuel_load": fuel_load,
                 "wind_speed": wind_speed,
             }
         )
