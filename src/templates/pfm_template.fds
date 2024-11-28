@@ -29,9 +29,7 @@
 
 !===============
 !===============
-cTIME T_BEGIN=-30., T_END=60. /
-&TIME T_BEGIN=0, T_END=4 /
-
+&TIME T_BEGIN=-30., T_END=60. /
 
 !======================================
 !Ambient Conditions and Level Set Value
