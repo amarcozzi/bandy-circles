@@ -19,12 +19,11 @@ def preprocess_simulation(experiment_path, parameters_df, simulation_id):
 
     # Extract parameters
     wind_speed = sim_params["wind_speed"]
+    fuel_load = sim_params["fuel_load"]
     control_fuel_height = sim_params["control_fuel_height"]
-    control_fuel_load = sim_params["control_fuel_load"]
     control_fuel_moisture_content = sim_params["control_fuel_moisture_content"]
     control_sav = sim_params["control_sav"]
     treatment_fuel_height = sim_params["treatment_fuel_height"]
-    treatment_fuel_load = sim_params["treatment_fuel_load"]
     treatment_fuel_moisture_content = sim_params["treatment_fuel_moisture_content"]
     treatment_sav = sim_params["treatment_sav"]
     circle_radius = sim_params["circle_radius"]
@@ -34,11 +33,11 @@ def preprocess_simulation(experiment_path, parameters_df, simulation_id):
     template_dict = {
         "wind_speed": wind_speed,
         "control_fuel_height": control_fuel_height,
-        "control_fuel_load": control_fuel_load,
+        "control_fuel_load": fuel_load,
         "control_fuel_moisture_content": control_fuel_moisture_content,
         "control_sav": control_sav,
         "treatment_fuel_height": treatment_fuel_height,
-        "treatment_fuel_load": treatment_fuel_load,
+        "treatment_fuel_load": fuel_load,
         "treatment_fuel_moisture_content": treatment_fuel_moisture_content,
         "treatment_sav": treatment_sav,
         "circle_radius": circle_radius,
@@ -49,8 +48,8 @@ def preprocess_simulation(experiment_path, parameters_df, simulation_id):
 
     # Calculate the mass per volume for the fuel models if using BFM
     if fuel_model == "bfm":
-        treatment_mass_per_volume = treatment_fuel_load / treatment_fuel_height
-        control_mass_per_volume = control_fuel_load / control_fuel_height
+        treatment_mass_per_volume = fuel_load / treatment_fuel_height
+        control_mass_per_volume = fuel_load / control_fuel_height
         template_dict["treatment_mass_per_volume"] = treatment_mass_per_volume
         template_dict["control_mass_per_volume"] = control_mass_per_volume
 
@@ -87,9 +86,9 @@ def preprocess_simulation(experiment_path, parameters_df, simulation_id):
             out_path=simulation_path,
             circle_radius=circle_radius,
             control_fuel_height=control_fuel_height,
-            control_fuel_load=control_fuel_load,
+            control_fuel_load=fuel_load,
             treatment_fuel_height=treatment_fuel_height,
-            treatment_fuel_load=treatment_fuel_load,
+            treatment_fuel_load=fuel_load,
             dx=dx,
             dy=dy,
             xmin=xmin,
