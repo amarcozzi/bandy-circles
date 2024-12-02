@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=grid-search
 #SBATCH --account=umontana_fire_modeling
-#SBATCH --array=0-59%5
+#SBATCH --array=0-4%5
 #SBATCH --nodes=2
 #SBATCH -n 88
 #SBATCH --mem-per-cpu=1G
