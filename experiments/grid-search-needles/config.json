@@ -1,0 +1,11 @@
+{
+    "fuel_model": ["pfm"],
+    "control_fuel_height": [0.4],
+    "treatment_fuel_height": [0.1, 0.2, 0.3, 0.4],
+    "control_fuel_moisture_content": [0.25],
+    "treatment_fuel_moisture_content": [0.25],
+    "control_sav": [6561],
+    "treatment_sav": [6561],
+    "fuel_load": [0.55],
+    "circle_radius": [0.9, 1.35, 1.8, 2.25, 2.7],
+    "wind_speed": [1.00, 1.22, 1.44, 1.67, 1.89, 2.11, 2.33, 2.56, 2.78, 3.00]}
