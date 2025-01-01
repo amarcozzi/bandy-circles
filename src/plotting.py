@@ -9,6 +9,17 @@ from matplotlib.colors import Normalize, TwoSlopeNorm, LinearSegmentedColormap
 from matplotlib.gridspec import GridSpec
 
 
+import numpy as np
+import xarray as xr
+import matplotlib.pyplot as plt
+from matplotlib import animation
+from typing import Optional, List, Tuple
+from xarray.core.dataarray import DataArray
+from matplotlib.collections import LineCollection
+from matplotlib.colors import Normalize, TwoSlopeNorm, LinearSegmentedColormap
+from matplotlib.gridspec import GridSpec
+
+
 def create_dataset_movie(
     dataset: xr.Dataset,
     quantity: str,
@@ -22,6 +33,7 @@ def create_dataset_movie(
     end_time: Optional[float] = None,
     z_level: Optional[float] = None,
     verbose: bool = False,
+    circle_radius: Optional[float] = None,
 ):
     # Time selection
     if start_time is not None:
@@ -59,6 +71,13 @@ def create_dataset_movie(
         animated=True,
         interpolation="bilinear",
     )
+
+    # Add circle if radius is provided
+    if circle_radius is not None:
+        circle = plt.Circle(
+            (0, 0), circle_radius, fill=False, color="red", linestyle="--", alpha=0.8
+        )
+        ax_main.add_artist(circle)
 
     # Enhanced colorbar
     cbar = fig.colorbar(im, cax=ax_colorbar)
