@@ -36,9 +36,9 @@ def plot_curvature_heatmap(radius, data_file='/Volumes/T7 Shield/bandy-circles/g
     )
     
     # Customize plot
-    plt.title(f'Curvature Heatmap (Circle Radius = {radius})')
-    plt.xlabel('Wind Speed')
-    plt.ylabel('Treatment Fuel Height')
+    plt.title(f'Curvature Heatmap (Circle Radius = {radius})m')
+    plt.xlabel('Wind Speed (m/s)')
+    plt.ylabel('Treatment Fuel Height (m)')
     
     plt.tight_layout()
     return plt.gcf()
