@@ -18,11 +18,16 @@ def plot_curvature_heatmap(radius, data_file='/Volumes/T7 Shield/bandy-circles/g
     # Create figure with larger size
     plt.figure(figsize=(12, 8))
     
+    # Find symmetric limits for colorbar
+    abs_max = max(abs(pivot.min().min()), abs(pivot.max().max()))
+    
     # Create heatmap
     sns.heatmap(
-        pivot,
+        pivot.sort_index(ascending=False),  # Flip y-axis
         cmap='RdBu_r',
         center=0,
+        vmin=-abs_max,
+        vmax=abs_max,
         annot=True,
         fmt='.2f',
         cbar_kws={'label': 'Curvature'},
