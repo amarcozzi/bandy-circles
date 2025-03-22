@@ -37,7 +37,7 @@ python3 $BANDY_DIR_SRC/preprocess_from_csv.py $PWD $SLURM_ARRAY_TASK_ID
 
 # Activate MPI Module
 echo "$(date +%Y-%m-%d' '%H:%M:%S.%N): Activating MPI module"
-module load intel-oneapi-mpi
+module load intel-oneapi-compilers intel-oneapi-mpi
 
 # Run FDS
 echo "$(date +%Y-%m-%d' '%H:%M:%S.%N): Running FDS"
