@@ -1,4 +1,4 @@
-echo "Running experiment: 1D-wind-speed-grid-search"
+echo "Running experiment: grid-search"
 
 # Remove the output directory if it exists
 rm -rf output

@@ -1,4 +1,4 @@
-echo "Running experiment: 1D-wind-speed-grid-search"
+echo "Running experiment: grid-search-fine"
 
 # Remove the output directory if it exists
 rm -rf output
@@ -7,6 +7,7 @@ rm -rf output
 mkdir output
 
 # Prep environment
+source $PROJECT_DIR/miniforge3/etc/profile.d/conda.sh
 conda activate bandy-circles
 module load intel-oneapi-mpi
 
