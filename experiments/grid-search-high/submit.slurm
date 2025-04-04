@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=grid-search
 #SBATCH --account=umontana_fire_modeling
-#SBATCH --array=80-299%15
+#SBATCH --array=0-449%15
 #SBATCH --nodes=2
 #SBATCH -n 88
 #SBATCH --mem-per-cpu=1G
@@ -37,7 +37,7 @@ python3 $BANDY_DIR_SRC/preprocess_from_csv.py $PWD $SLURM_ARRAY_TASK_ID
 
 # Activate MPI Module
 echo "$(date +%Y-%m-%d' '%H:%M:%S.%N): Activating MPI module"
-module load intel-oneapi-mpi
+module load intel-oneapi-compilers intel-oneapi-mpi
 
 # Run FDS
 echo "$(date +%Y-%m-%d' '%H:%M:%S.%N): Running FDS"
