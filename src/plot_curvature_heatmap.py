@@ -1,8 +1,17 @@
+"""
+plot_curvature_heatmap.py
+"""
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 from pathlib import Path
+
+plt.rcParams['font.size'] = '16'
+
+# Set the default font family to serif
+plt.rcParams['font.family'] = 'serif'
 
 
 def plot_curvature_heatmap(df, radius, ax=None, x_max=None, y_max=None):
@@ -48,22 +57,71 @@ def plot_curvature_heatmap(df, radius, ax=None, x_max=None, y_max=None):
         fig = ax.figure
 
     # Create heatmap
-    sns.heatmap(
+    # sns.heatmap(
+    #     pivot.sort_index(ascending=False),
+    #     cmap="RdBu_r",
+    #     center=0,
+    #     vmin=-0.5,
+    #     vmax=0.5,
+    #     annot=False,
+    #     fmt=".2f",
+    #     cbar=True,
+    #     cbar_kws={"label": "Curvature ($\kappa$)"},
+    #     xticklabels=2,
+    #     yticklabels=1,
+    #     square=True,
+    #     ax=ax
+    # )
+
+    # Customize plot
+    # ax.set_title(f"Curvature Heatmap (Circle Radius = {radius}m)")
+    # ax.set_xlabel("Wind Speed (m/s)")
+    # ax.set_ylabel("Treatment Fuel Height (m)")
+
+    # Set equal aspect
+    # ax.set_aspect("equal")
+
+    # Create heatmap with default parameters first
+    hm = sns.heatmap(
         pivot.sort_index(ascending=False),
         cmap="RdBu_r",
         center=0,
-        vmin=-1,
-        vmax=1,
-        annot=True,
+        vmin=-0.5,
+        vmax=0.5,
+        annot=False,
         fmt=".2f",
-        cbar_kws={"label": "Curvature"},
-        xticklabels=2,
-        yticklabels=2,
+        cbar=False,  # Don't create colorbar yet
+        xticklabels=False,
+        yticklabels=False,
+        square=True,
         ax=ax
     )
 
-    # Customize plot
-    ax.set_title(f"Curvature Heatmap (Circle Radius = {radius}m)")
+    # Get the actual unique values from your dataset for tick placement
+    wind_speeds = sorted(df_filtered["wind_speed"].unique())
+    fuel_heights = sorted(df_filtered["treatment_fuel_height"].unique(), reverse=True)
+
+    # Set custom ticks for x-axis (wind_speed)
+    x_positions = np.arange(len(wind_speeds)) + 0.5  # Center of each cell
+    ax.set_xticks(x_positions)
+    ax.set_xticklabels([f"{x:.1f}" for x in wind_speeds])
+
+    # Set custom ticks for y-axis (treatment_fuel_height)
+    y_positions = np.arange(len(fuel_heights)) + 0.5  # Center of each cell
+    ax.set_yticks(y_positions)
+    ax.set_yticklabels([f"{y:.1f}" for y in fuel_heights])
+
+    # Now create the colorbar separately with matching height
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="3.5%", pad=0.1)
+    cbar = fig.colorbar(hm.collections[0], cax=cax)
+    cbar.set_label("$\kappa_{\\text{scaled}}$")
+
+    # Set colorbar ticks
+    cbar.set_ticks(np.arange(-0.5, 0.51, 0.1))
+    cbar.set_ticklabels([f"{v:.1f}" for v in np.arange(-0.5, 0.51, 0.1)])
+
     ax.set_xlabel("Wind Speed (m/s)")
     ax.set_ylabel("Treatment Fuel Height (m)")
 
@@ -127,12 +185,19 @@ def combined_heatmap_figure(df, radii, x_max=None, y_max=None):
 
 
 def main():
-    data_path = Path("/Volumes/T7 Shield/bandy-circles/grid-search-high")
+    data_path = Path("/Volumes/T7 Shield/bandy-circles/grid-search-combined")
     quantity = "heat_flux"
-    df = pd.read_csv(data_path / f"curvatures_{quantity}.csv")
+    df = pd.read_csv(data_path / f"ideal_curvatures_{quantity}.csv")
+
+    df = df[df["wind_speed"] >= 1.5]
+    df = df[df["wind_speed"] < 3.2]
 
     # Define radii
     radii = [0.9, 1.35, 1.8, 2.25, 2.7]
+
+    # Mess with scaling line length
+    line_length = df["circle_radius"] / df["circle_radius"].max()
+    df["curvature"] = df["curvature"] * line_length
 
     # Optional: Set max values for x and y axes
     x_max = None  # Maximum wind speed to include (e.g., 5.0)
@@ -142,11 +207,11 @@ def main():
     combined_fig, individual_figs = combined_heatmap_figure(df, radii, x_max=x_max, y_max=y_max)
 
     # Save combined figure
-    combined_fig.savefig(data_path / f"combined_curvature_heatmaps_{quantity}.png", dpi=300, bbox_inches='tight')
+    # combined_fig.savefig(data_path / f"combined_ideal_curvature_heatmaps_{quantity}.png", dpi=1600, bbox_inches='tight')
 
     # Save individual figures if needed
     for i, (radius, fig) in enumerate(zip(radii, individual_figs)):
-        fig.savefig(data_path / f"curvature_heatmap_{radius}_{quantity}.png", dpi=300, bbox_inches='tight')
+        fig.savefig(data_path / f"heatmap_{radius}.pdf", dpi=1600, bbox_inches='tight')
         plt.close(fig)  # Close individual figure
 
     # Show combined figure
