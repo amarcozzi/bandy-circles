@@ -1,3 +1,7 @@
+"""
+compute_curvature.py
+"""
+
 import sys
 import numpy as np
 import xarray as xr
@@ -14,9 +18,11 @@ from postprocess import (
     get_polynomial,
     get_active_fire_array,
     get_fire_line,
+    get_fire_line_ideal,
     find_fire_intersection_time,
 )
-from plotting import plot_fire_front_evolution, plot_fire_front_with_polynomial_fit, plot_combined_fire_front_analysis
+from plotting import plot_fire_front_evolution, plot_fire_front_with_polynomial_fit, plot_combined_fire_front_analysis, \
+    plot_polynomials
 
 NUM_WORKERS = 7
 
@@ -25,10 +31,12 @@ NUM_WORKERS = 7
 TARGET_SIM_ID = None
 QUANTITY = "heat_flux"
 
+R_C_MAX = 2.7
+
 
 def get_curvature(polynomial_coeffs: list) -> list:
     # Get curvatures (2 * quadratic coefficient) for all polynomials
-    return [-2 * coeffs[0] for coeffs in polynomial_coeffs]
+    return [2 * coeffs[0] for coeffs in polynomial_coeffs]
 
 
 def process_simulation(args) -> tuple:
@@ -65,7 +73,7 @@ def process_simulation(args) -> tuple:
         # starting_mass = mass_xy.isel(time=0).copy() * 0 + 0.00356416
         # mass_loss_percent = (starting_mass - mass_xy) / starting_mass * 100
 
-        # On average, at what time does the fireline reach y=0 to the left of the circle out to x=-5?
+        # On average, at what time does the fireline reach y=0 to the left of the circle out to x=-10?
         circle_radius = sim_params["circle_radius"]
         left_points = np.arange(-10, -circle_radius - 0.25, 0.1)
         left_times = []
@@ -74,10 +82,10 @@ def process_simulation(args) -> tuple:
             time, index = find_fire_intersection_time(data["ACTIVE FIRE"], x, 0)
             left_times.append(time)
             left_indices.append(index)
-        left_time = float(np.median(left_times))
-        left_index = int(np.median(left_indices) + 0.5)
+        left_time = float(np.mean(left_times))
+        left_index = int(np.mean(left_indices) + 0.5)
 
-        # On average, at what time does the fireline reach y=0 to the right of the circle out to x=5?
+        # On average, at what time does the fireline reach y=0 to the right of the circle out to x=10?
         right_points = np.arange(circle_radius + 0.25, 10, 0.1)
         right_times = []
         right_indices = []
@@ -85,8 +93,8 @@ def process_simulation(args) -> tuple:
             time, index = find_fire_intersection_time(data["ACTIVE FIRE"], x, 0)
             right_times.append(time)
             right_indices.append(index)
-        right_time = float(np.median(right_times))
-        right_index = int(np.median(right_indices) + 0.5)
+        right_time = float(np.mean(right_times))
+        right_index = int(np.mean(right_indices) + 0.5)
 
         if not left_time or not right_time:
             return sim_id, {"curvature": 0}
@@ -95,13 +103,15 @@ def process_simulation(args) -> tuple:
         # target_index = (left_index + right_index) // 2
         first_index = max(left_index, right_index)
         last_index = max(left_index, right_index)
-        fire_line = get_fire_line(
-            data["ACTIVE FIRE"],
-            first_index,
-            last_index,
-            -circle_radius - circle_radius,
-            circle_radius + circle_radius,
-        )
+        # fire_line = get_fire_line(
+        #     data["ACTIVE FIRE"],
+        #     first_index,
+        #     last_index,
+        #     -circle_radius,
+        #     circle_radius,
+        # )
+        fire_line = get_fire_line_ideal(data["ACTIVE FIRE"], first_index, last_index, circle_radius,
+                                        -circle_radius - circle_radius, circle_radius + circle_radius)
 
         # Get actual time values in seconds for plotting
         # Extract from data's time coordinate if available
@@ -125,14 +135,16 @@ def process_simulation(args) -> tuple:
         )
 
         # Save the figure for later reference
-        fig_combined.savefig(f"{sim_directory}/fire_front_analysis_{QUANTITY}.png", dpi=300, bbox_inches='tight')
+        fig_combined.savefig(f"{sim_directory}/ideal_fire_front_analysis_{QUANTITY}.png", dpi=300, bbox_inches='tight')
         plt.close(fig_combined)  # Close the figure to free memory
 
         # Get the curvature of the fireline
         curvature = get_curvature(polynomial)
         avg_curvature = np.mean(curvature)
 
-        return sim_id, {"curvature": avg_curvature}
+        scaled_curvature = avg_curvature * sim_params["circle_radius"] / R_C_MAX
+
+        return sim_id, {"curvature": avg_curvature, "scaled_curvature": scaled_curvature}
 
     except Exception as e:
         print(f"Error processing simulation {sim_id}: {str(e)}")
@@ -196,8 +208,8 @@ def postprocess(experiment_directory: str | Path):
 
     # Save to CSV
     if not TARGET_SIM_ID:
-        final_df.to_csv(experiment_directory / f"curvatures_{QUANTITY}.csv")
-        print(f"Processing complete. Results saved to curvatures_{QUANTITY}.csv")
+        final_df.to_csv(experiment_directory / f"ideal_curvatures_{QUANTITY}.csv")
+        print(f"Processing complete. Results saved to ideal_curvatures_{QUANTITY}.csv")
 
 
 if __name__ == "__main__":
@@ -206,5 +218,5 @@ if __name__ == "__main__":
 
     else:
         postprocess(
-            "/Volumes/T7 Shield/bandy-circles/grid-search-high",
+            "/Volumes/T7 Shield/bandy-circles/grid-search-combined",
         )
