@@ -119,8 +119,12 @@ def plot_curvature_heatmap(df, radius, ax=None, x_max=None, y_max=None):
     cbar.set_label("$\kappa^*$")
 
     # Set colorbar ticks
-    cbar.set_ticks(np.arange(-0.5, 0.51, 0.1))
-    cbar.set_ticklabels([f"{v:.1f}" for v in np.arange(-0.5, 0.51, 0.1)])
+    cbar.set_ticks(np.arange(-1.0, 1.2, 0.2))
+    tick_labels_negative = [f"{v:.1f}" for v in np.arange(-1.0, 0, 0.2)]
+    tick_labels_positive = [f" {v:.1f}" for v in
+                            np.arange(0, 1.2, 0.2)]  # Add space before positive values to align with negative values
+    cbar.set_ticklabels(tick_labels_negative + tick_labels_positive)
+    # cbar.set_ticklabels([f"{v:.1f}" for v in np.arange(-0.5, 0.51, 0.1)])
 
     ax.set_xlabel("Wind Speed (m/s)")
     ax.set_ylabel("Treatment Fuel Height (m)")
