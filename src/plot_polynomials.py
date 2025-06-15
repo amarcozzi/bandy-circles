@@ -4,24 +4,19 @@ from pathlib import Path
 from postprocess import (
     get_particle_data_array,
     get_polynomial,
-    get_active_fire_array,
     get_fire_line,
-    get_fire_line_ideal,
     find_fire_intersection_time,
 )
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import matplotlib.patheffects as pe
 from typing import Optional, List
 from matplotlib.colors import Normalize
 from matplotlib.colors import LinearSegmentedColormap
 
-import scienceplots
-
 plt.style.use(['science', 'bright'])
 plt.rcParams['font.size'] = '24'
 
-TARGET_SIM_ID = 480
+# TARGET_SIM_ID = 480  # Left figure
+TARGET_SIM_ID = 484  # Right figure
 
 
 def plot_polynomials(
@@ -59,10 +54,11 @@ def plot_polynomials(
     ax.add_artist(circle)
 
     # Get curvatures (2 * quadratic coefficient) for all polynomials
-    curvatures = [2 * coeffs[0] for coeffs in polynomial_coeffs]
+    curvatures = [2 * circle_radius * coeffs[0] for coeffs in polynomial_coeffs]
 
     # Create a symmetric normalization centered at 0
-    max_abs_curvature = max(abs(min(curvatures)), abs(max(curvatures)))
+    # max_abs_curvature = max(abs(min(curvatures)), abs(max(curvatures)))
+    max_abs_curvature = 0.7  # Set a fixed range for curvature normalization
     norm = Normalize(-max_abs_curvature, max_abs_curvature)
 
     # min_curvature = min(curvatures)
@@ -92,12 +88,11 @@ def plot_polynomials(
     # Add colorbar with centered ticks
     sm = plt.cm.ScalarMappable(cmap=custom_cmap, norm=norm)
     cbar = plt.colorbar(
-        sm, label="$\kappa$", ax=ax  # cax=fig.add_axes([0.92, 0.1, 0.02, 0.8])
+        sm, label="$\kappa^*$", ax=ax
     )
 
     # Set colorbar ticks to show the symmetry
     tick_locations = np.linspace(-max_abs_curvature, max_abs_curvature, 5)
-    # tick_locations = np.linspace(min_curvature, 0, 5)
     cbar.set_ticks(tick_locations)
     cbar.set_ticklabels([f"{val:.2f}" for val in tick_locations])
 
@@ -106,8 +101,6 @@ def plot_polynomials(
     ax.set_xlabel("x (m)")
     ax.set_ylim(-3, 3)
     ax.set_ylabel("y (m)")
-    plot_time_range = f"{times[0]:.1f}s to {times[-1]:.1f}s"
-    # ax.set_title(f"Fire Front Evolution with Curvature Coloring\n{plot_time_range}")
 
     # Set equal aspect ratio
     ax.set_aspect("equal")
@@ -191,7 +184,7 @@ def main():
 
     polynomial = get_polynomial(fire_line)
 
-    n = 4
+    n = 4  # Sample every n time steps to reduce the number of polynomials plotted
     polynomial = polynomial[::n]
     times_in_seconds = times_in_seconds[::n]
     plot_polynomials(polynomial,
