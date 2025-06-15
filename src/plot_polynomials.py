@@ -12,11 +12,15 @@ from typing import Optional, List
 from matplotlib.colors import Normalize
 from matplotlib.colors import LinearSegmentedColormap
 
+import scienceplots
+
 plt.style.use(['science', 'bright'])
 plt.rcParams['font.size'] = '24'
 
-# TARGET_SIM_ID = 480  # Left figure
-TARGET_SIM_ID = 484  # Right figure
+TARGET_SIM_ID = 480  # Left figure
+
+
+# TARGET_SIM_ID = 484  # Right figure
 
 
 def plot_polynomials(
