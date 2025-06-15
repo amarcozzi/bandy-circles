@@ -86,8 +86,8 @@ def plot_curvature_heatmap(df, radius, ax=None, x_max=None, y_max=None):
         pivot.sort_index(ascending=False),
         cmap="RdBu_r",
         center=0,
-        vmin=-0.5,
-        vmax=0.5,
+        vmin=-1.0,
+        vmax=1.0,
         annot=False,
         fmt=".2f",
         cbar=False,  # Don't create colorbar yet
@@ -116,7 +116,7 @@ def plot_curvature_heatmap(df, radius, ax=None, x_max=None, y_max=None):
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="3.5%", pad=0.1)
     cbar = fig.colorbar(hm.collections[0], cax=cax)
-    cbar.set_label("$\kappa_{\\text{scaled}}$")
+    cbar.set_label("$\kappa^*$")
 
     # Set colorbar ticks
     cbar.set_ticks(np.arange(-0.5, 0.51, 0.1))
@@ -196,7 +196,8 @@ def main():
     radii = [0.9, 1.35, 1.8, 2.25, 2.7]
 
     # Mess with scaling line length
-    line_length = df["circle_radius"] / df["circle_radius"].max()
+    # line_length = df["circle_radius"] / df["circle_radius"].max()
+    line_length = df["circle_radius"]
     df["curvature"] = df["curvature"] * line_length
 
     # Optional: Set max values for x and y axes
